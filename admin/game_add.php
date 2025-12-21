@@ -29,7 +29,7 @@
 
                 <div class="p-6 md:p-10 flex-1">
                     <div class="max-w-5xl mx-auto">
-                        <a href="game_info.php" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brandGold transition mb-8">
+                        <a href="games.php" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brandGold transition mb-8">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                             Back to Game Portfolio
                         </a>
