@@ -1,0 +1,18 @@
+/* assets/style.css */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Custom scrollbar untuk sidebar agar tetap cantik */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #333A73;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #4a54a8;
+    border-radius: 10px;
+}
