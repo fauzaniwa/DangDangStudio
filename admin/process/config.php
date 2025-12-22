@@ -1,4 +1,15 @@
 <?php
+// --- OTOMATIS CLEAN URL HELPER ---
+ob_start(function($buffer) {
+    /**
+     * Regex ini mencari href="nama_file.php"
+     * (?![^"]*process\/) -> JANGAN hapus jika link mengandung kata 'process/'
+     * (?![^"]*\/)        -> JANGAN hapus jika link mengandung folder lain (ada tanda /)
+     */
+    return preg_replace('/href="(?![^"]*process\/|[^"]*\/)([^"]+)\.php(\??[^"]*)"/', 'href="$1$2"', $buffer);
+});
+// ... (sisanya adalah kode koneksi database dan fungsi createLog Anda)
+// ... kode koneksi database Anda ...
 // Database Configuration
 $host     = "localhost";
 $user     = "root"; 

@@ -1,0 +1,24 @@
+RewriteEngine On
+
+# --- BATASAN: ABAIKAN FOLDER PROCESS & UPLOADS ---
+# Jika request mengandung folder /process/ atau /uploads/, berhenti di sini dan jangan ubah URL-nya
+RewriteRule ^(process|uploads) - [L]
+
+# 1. Redirect /nama_file.php ke /nama_file (Hanya untuk file di folder utama)
+# Cek apakah file bukan folder dan file .php-nya ada
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteCond %{REQUEST_URI} !^/process/ [NC]
+RewriteRule ^ %1 [R=301,L]
+
+# 2. Mapping internal: Jika akses /nama_file, jalankan nama_file.php secara diam-diam
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# 3. Fallback ke index.php (Pola Page System Anda)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9_-]+)$ index.php?page=$1 [L,QSA]
+
+# 4. Penanganan Error
+ErrorDocument 404 /error.php
