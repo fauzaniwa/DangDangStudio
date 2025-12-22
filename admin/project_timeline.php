@@ -32,7 +32,7 @@
                         </div>
                         <div class="flex gap-2">
                             <button class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition">Filter</button>
-                            <button class="px-4 py-2 bg-brandPrimary text-white rounded-xl text-sm font-bold shadow-lg shadow-brandPrimary/20 hover:scale-105 transition-all">+ New Task</button>
+                            <a href="project_timeline_add.php" class="px-4 py-2 bg-brandPrimary text-white rounded-xl text-sm font-bold shadow-lg shadow-brandPrimary/20 hover:scale-105 transition-all">+ New Task</a>
                         </div>
                     </div>
 

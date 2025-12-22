@@ -1,3 +1,25 @@
+<?php
+require_once './process/config.php';
+session_start();
+
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Ambil data client untuk dropdown
+$query_clients = "SELECT id, company_name FROM clients ORDER BY company_name ASC";
+$result_clients = mysqli_query($conn, $query_clients);
+
+// 2. Generate Invoice Number Otomatis (Format: INV/YYYYMMDD/LAST_ID)
+$date_code = date('Ymd');
+$query_last_id = "SELECT id FROM invoices ORDER BY id DESC LIMIT 1";
+$res_last_id = mysqli_query($conn, $query_last_id);
+$last_id_data = mysqli_fetch_assoc($res_last_id);
+$next_id = ($last_id_data['id'] ?? 0) + 1;
+$invoice_no = "INV/" . $date_code . "/" . str_pad($next_id, 3, '0', STR_PAD_LEFT);
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -9,7 +31,6 @@
     <script src="assets/tailwind-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
-    <script src="assets/script.js"></script>
 </head>
 
 <body class="bg-gray-50 text-slate-800">
@@ -31,24 +52,29 @@
                         Back to Manager
                     </a>
 
-                    <form action="process_invoice.php" method="POST" id="invoiceForm">
+                    <form action="process/process_invoice.php" method="POST" id="invoiceForm">
                         <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
                             <div class="p-8 border-b border-gray-50 bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Select Client</label>
-                                    <select name="client_id" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brandPrimary transition">
+                                    
+
+                                    <select name="client_id" required class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brandPrimary transition font-medium">
                                         <option value="">Choose Client...</option>
-                                        <option value="1">PT. Maju Bersama</option>
-                                        <option value="2">StartUp Digital</option>
+                                        <?php while ($row = mysqli_fetch_assoc($result_clients)): ?>
+                                            <option value="<?php echo $row['id']; ?>">
+                                                <?php echo htmlspecialchars($row['company_name']); ?>
+                                            </option>
+                                        <?php endwhile; ?>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Invoice Number</label>
-                                    <input type="text" name="invoice_no" value="INV/<?php echo date('Ymd'); ?>/001" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 outline-none" readonly>
+                                    <input type="text" name="invoice_no" value="<?php echo $invoice_no; ?>" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 outline-none font-bold text-brandPrimary" readonly>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Due Date</label>
-                                    <input type="date" name="due_date" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brandPrimary transition">
+                                    <input type="date" name="due_date" required value="<?php echo date('Y-m-d', strtotime('+7 days')); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brandPrimary transition">
                                 </div>
                             </div>
 
@@ -66,13 +92,13 @@
                                     <tbody id="itemRows">
                                         <tr class="item-row border-b border-gray-50">
                                             <td class="py-4">
-                                                <input type="text" name="desc[]" placeholder="Item/Service name" class="w-full bg-transparent outline-none text-sm font-medium">
+                                                <input type="text" name="desc[]" required placeholder="Project Branding / UI Design" class="w-full bg-transparent outline-none text-sm font-medium">
                                             </td>
                                             <td class="py-4 px-4">
                                                 <input type="number" name="qty[]" value="1" min="1" class="qty-input w-full bg-transparent outline-none text-sm font-bold text-brandPrimary">
                                             </td>
                                             <td class="py-4 px-4">
-                                                <input type="number" name="price[]" value="0" class="price-input w-full bg-transparent outline-none text-sm font-bold text-brandPrimary">
+                                                <input type="number" name="price[]" value="0" min="0" class="price-input w-full bg-transparent outline-none text-sm font-bold text-brandPrimary">
                                             </td>
                                             <td class="py-4 text-sm font-bold text-right text-brandPrimary">
                                                 <span class="row-total">0</span>
@@ -88,7 +114,7 @@
                                     </tbody>
                                 </table>
 
-                                <button type="button" id="addItem" class="mt-6 flex items-center gap-2 text-xs font-bold text-brandTeal hover:underline">
+                                <button type="button" id="addItem" class="mt-6 flex items-center gap-2 text-xs font-bold text-brandTeal hover:underline transition-all">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                     </svg>
@@ -99,7 +125,7 @@
                             <div class="p-8 bg-gray-50/50 flex flex-col md:flex-row justify-between items-start gap-8">
                                 <div class="w-full md:w-1/2">
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Notes / Payment Instructions</label>
-                                    <textarea name="notes" rows="4" class="w-full p-4 rounded-2xl border border-gray-200 bg-white outline-none text-sm" placeholder="Bank BCA - 123456789 a/n DangDang Studio"></textarea>
+                                    <textarea name="notes" rows="4" class="w-full p-4 rounded-2xl border border-gray-200 bg-white outline-none text-sm resize-none focus:border-brandPrimary transition" placeholder="Bank BCA - 123456789 a/n DangDang Studio"></textarea>
                                 </div>
                                 <div class="w-full md:w-1/3 space-y-3">
                                     <div class="flex justify-between items-center text-sm font-medium text-gray-500">
@@ -114,7 +140,10 @@
                                         <span class="text-lg font-bold text-brandPrimary">Grand Total</span>
                                         <span id="grandTotal" class="text-lg font-bold text-brandPrimary">Rp 0</span>
                                     </div>
-                                    <button type="submit" class="w-full mt-4 py-4 bg-brandPrimary text-white rounded-2xl font-bold shadow-xl shadow-brandPrimary/20 hover:scale-[1.02] transition-all">
+
+                                    <input type="hidden" name="total_amount" id="inputGrandTotal" value="0">
+
+                                    <button type="submit" class="w-full mt-4 py-4 bg-brandPrimary text-white rounded-2xl font-bold shadow-xl shadow-brandPrimary/20 hover:scale-[1.02] active:scale-95 transition-all">
                                         Finalize & Generate Invoice
                                     </button>
                                 </div>
@@ -133,15 +162,13 @@
             const itemRows = document.getElementById('itemRows');
             const addItemBtn = document.getElementById('addItem');
 
-            // Hitung total saat input berubah
             itemRows.addEventListener('input', calculateInvoice);
 
-            // Tambah baris baru
             addItemBtn.addEventListener('click', function() {
                 const newRow = `
                 <tr class="item-row border-b border-gray-50">
                     <td class="py-4">
-                        <input type="text" name="desc[]" placeholder="Item/Service name" class="w-full bg-transparent outline-none text-sm font-medium">
+                        <input type="text" name="desc[]" required placeholder="Item/Service name" class="w-full bg-transparent outline-none text-sm font-medium">
                     </td>
                     <td class="py-4 px-4">
                         <input type="number" name="qty[]" value="1" min="1" class="qty-input w-full bg-transparent outline-none text-sm font-bold text-brandPrimary">
@@ -161,7 +188,6 @@
                 itemRows.insertAdjacentHTML('beforeend', newRow);
             });
 
-            // Hapus baris
             itemRows.addEventListener('click', function(e) {
                 if (e.target.closest('.remove-row')) {
                     const row = e.target.closest('.item-row');
@@ -175,8 +201,8 @@
             function calculateInvoice() {
                 let subtotal = 0;
                 document.querySelectorAll('.item-row').forEach(row => {
-                    const qty = row.querySelector('.qty-input').value || 0;
-                    const price = row.querySelector('.price-input').value || 0;
+                    const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                    const price = parseFloat(row.querySelector('.price-input').value) || 0;
                     const total = qty * price;
                     row.querySelector('.row-total').textContent = total.toLocaleString('id-ID');
                     subtotal += total;
@@ -188,6 +214,9 @@
                 document.getElementById('subtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
                 document.getElementById('tax').textContent = 'Rp ' + tax.toLocaleString('id-ID');
                 document.getElementById('grandTotal').textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+
+                // Set hidden input value
+                document.getElementById('inputGrandTotal').value = grandTotal;
             }
         });
     </script>
