@@ -1,3 +1,13 @@
+<?php
+require_once './process/config.php';
+session_start();
+
+// Proteksi Halaman: Hanya Super Admin yang bisa masuk ke menu ini (Opsional tapi disarankan)
+if (!isset($_SESSION['is_logged_in'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 

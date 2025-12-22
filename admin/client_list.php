@@ -140,14 +140,57 @@ $result = mysqli_query($conn, $query);
         </div>
     </div>
 
+    <div id="modal-delete" class="fixed inset-0 z-[100] hidden overflow-y-auto">
+        <div class="fixed inset-0 bg-brandPrimary/40 backdrop-blur-sm transition-opacity" onclick="closeModalDelete()"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <div class="relative transform overflow-hidden rounded-[32px] bg-white p-8 text-left shadow-2xl transition-all w-full max-w-md animate-fade-in">
+                <div class="flex flex-col items-center">
+                    <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-10 h-10 text-brandAccent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-brandPrimary mb-2">Delete Client?</h3>
+                    <p class="text-sm text-gray-500 text-center mb-8">
+                        Are you sure you want to delete <span id="delete-client-name" class="font-bold text-brandPrimary"></span>? This action cannot be undone.
+                    </p>
+                    <div class="flex gap-3 w-full">
+                        <button onclick="closeModalDelete()" class="flex-1 py-4 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition">Cancel</button>
+                        <a id="btn-confirm-delete" href="#" class="flex-1 py-4 bg-brandAccent text-white rounded-2xl font-bold shadow-lg shadow-brandAccent/20 hover:scale-[1.02] transition-all text-center">Delete Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/script.js"></script>
     <script>
+        // function confirmDelete(id, name) {
+        //     // Menggunakan template literal agar lebih rapi
+        //     if (confirm(`Apakah Anda yakin ingin menghapus "${name}"?\nData yang sudah dihapus tidak dapat dikembalikan.`)) {
+        //         // Arahkan ke file proses delete di dalam folder process/
+        //         window.location.href = 'process/client_delete.php?id=' + id;
+        //     }
+        // }
+
         function confirmDelete(id, name) {
-            // Menggunakan template literal agar lebih rapi
-            if (confirm(`Apakah Anda yakin ingin menghapus "${name}"?\nData yang sudah dihapus tidak dapat dikembalikan.`)) {
-                // Arahkan ke file proses delete di dalam folder process/
-                window.location.href = 'process/client_delete.php?id=' + id;
-            }
+            const modal = document.getElementById('modal-delete');
+            const nameDisplay = document.getElementById('delete-client-name');
+            const confirmBtn = document.getElementById('btn-confirm-delete');
+
+            // Set konten dinamis
+            nameDisplay.innerText = name;
+            confirmBtn.href = `process/client_delete.php?id=${id}`;
+
+            // Tampilkan modal
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Kunci scroll
+        }
+
+        function closeModalDelete() {
+            const modal = document.getElementById('modal-delete');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Kembalikan scroll
         }
     </script>
 </body>
