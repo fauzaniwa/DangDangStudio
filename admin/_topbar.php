@@ -1,6 +1,25 @@
+<?php
+// Pastikan session sudah start, jika belum, jalankan session_start()
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Ambil data dari session
+$admin_name = $_SESSION['admin_fullname'] ?? 'DangDang Team';
+$admin_role = $_SESSION['admin_role'] ?? 'Guest';
+
+// Logika mengambil inisial (contoh: "Aditya Pratama" -> "AP")
+$words = explode(" ", $admin_name);
+$initials = "";
+foreach ($words as $w) {
+    $initials .= $w[0];
+}
+$display_initials = strtoupper(substr($initials, 0, 2));
+?>
+
 <div class="hidden md:flex items-center justify-between bg-white border-b px-8 py-4">
     <div>
-        <h2 class="text-lg font-bold text-brandPrimary">Halo, DangDang Team! 👋</h2>
+        <h2 class="text-lg font-bold text-brandPrimary">Halo, <?= htmlspecialchars($admin_name); ?>! 👋</h2>
         <p class="text-[11px] text-gray-400 font-medium">Sistem manajemen studio sedang berjalan optimal.</p>
     </div>
     <div class="flex items-center gap-6">
@@ -11,11 +30,11 @@
 
         <div class="relative inline-block text-left" id="profileDropdown">
             <button id="profileBtn" class="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-2xl transition-all duration-300 group">
-                <div class="w-10 h-10 rounded-full bg-brandGold flex items-center justify-center text-white font-bold shadow-md group-hover:scale-110 transition-transform">
-                    D
+                <div class="w-10 h-10 rounded-full bg-brandGold flex items-center justify-center text-white font-bold shadow-md group-hover:scale-110 transition-transform text-sm">
+                    <?= $display_initials; ?>
                 </div>
                 <div class="text-left">
-                    <p class="text-sm font-bold text-brandPrimary leading-none">Super Admin</p>
+                    <p class="text-sm font-bold text-brandPrimary leading-none"><?= htmlspecialchars($admin_role); ?></p>
                     <p class="text-[10px] text-brandTeal font-bold uppercase tracking-tighter mt-1">Verified Account</p>
                 </div>
                 <svg class="w-4 h-4 text-gray-400 group-hover:text-brandPrimary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">

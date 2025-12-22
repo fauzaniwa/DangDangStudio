@@ -1,3 +1,13 @@
+<?php
+require_once './process/config.php';
+session_start();
+
+// Proteksi Halaman
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,6 +18,10 @@
     <script src="assets/tailwind-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
+    <style>
+        .star-btn svg { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .star-btn:hover svg { transform: scale(1.2); }
+    </style>
 </head>
 <body class="bg-[#FBFBFB] text-slate-800">
 
@@ -21,11 +35,13 @@
                 <div class="p-6 md:p-10 flex-1">
                     <div class="max-w-3xl mx-auto">
                         <a href="testimonials.php" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brandPrimary transition mb-8">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
                             Back to Reviews
                         </a>
 
-                        <form action="process_add_testimonial.php" method="POST" enctype="multipart/form-data" class="space-y-8 pb-20">
+                        <form action="process/process_add_testimonial.php" method="POST" enctype="multipart/form-data" class="space-y-8 pb-20">
                             
                             <div class="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-gray-100 space-y-8">
                                 <h2 class="text-xl font-bold text-brandPrimary flex items-center gap-3">
@@ -34,10 +50,12 @@
 
                                 <div class="flex flex-col md:flex-row gap-8 items-start md:items-center">
                                     <div class="relative group">
-                                        <div class="w-24 h-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden transition-all group-hover:border-brandGold shadow-sm">
+                                        <div class="w-24 h-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden transition-all group-hover:border-brandGold shadow-sm relative">
                                             <input type="file" name="avatar" accept="image/*" onchange="previewAvatar(this)" class="absolute inset-0 opacity-0 cursor-pointer z-20">
                                             <img id="avatar-prev" class="absolute inset-0 w-full h-full object-cover hidden z-10">
-                                            <svg id="avatar-placeholder" class="w-8 h-8 text-gray-300 z-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                            <svg id="avatar-placeholder" class="w-8 h-8 text-gray-300 z-0" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                            </svg>
                                         </div>
                                         <p class="text-[9px] font-bold text-gray-400 text-center mt-3 uppercase tracking-tighter">Click to Upload</p>
                                     </div>
@@ -59,8 +77,10 @@
                                     <div class="flex gap-2" id="star-container">
                                         <input type="hidden" name="stars" id="stars-input" value="5">
                                         <?php for($i=1; $i<=5; $i++): ?>
-                                            <button type="button" onclick="setRating(<?php echo $i; ?>)" class="star-btn p-1 text-brandGold transition hover:scale-125" data-value="<?php echo $i; ?>">
-                                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                            <button type="button" onclick="setRating(<?php echo $i; ?>)" class="star-btn p-1 text-brandGold transition" data-value="<?php echo $i; ?>">
+                                                <svg class="w-8 h-8 pointer-events-none" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                                </svg>
                                             </button>
                                         <?php endfor; ?>
                                     </div>
@@ -72,7 +92,7 @@
                                 </div>
 
                                 <div class="pt-6">
-                                    <button type="submit" class="w-full py-5 bg-brandGold text-white rounded-[24px] font-bold text-lg shadow-xl shadow-brandGold/30 hover:scale-[1.02] active:scale-95 transition-all">
+                                    <button type="submit" class="w-full py-5 bg-brandGold text-white rounded-[24px] font-bold text-lg shadow-xl shadow-brandGold/30 hover:scale-[1.01] active:scale-95 transition-all">
                                         Publish Testimonial
                                     </button>
                                 </div>
@@ -86,7 +106,6 @@
         </div>
     </div>
 
-    <script src="assets/script.js"></script>
     <script>
         // Preview Avatar
         function previewAvatar(input) {
@@ -112,16 +131,14 @@
             stars.forEach(star => {
                 const starVal = parseInt(star.getAttribute('data-value'));
                 if(starVal <= val) {
-                    star.classList.remove('text-gray-200');
-                    star.classList.add('text-brandGold');
+                    star.classList.replace('text-gray-200', 'text-brandGold');
                 } else {
-                    star.classList.remove('text-brandGold');
-                    star.classList.add('text-gray-200');
+                    star.classList.replace('text-brandGold', 'text-gray-200');
                 }
             });
         }
 
-        // Initialize rating as 5 stars
+        // Default: 5 Stars
         setRating(5);
     </script>
 </body>

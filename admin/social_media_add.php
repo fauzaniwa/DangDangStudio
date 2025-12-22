@@ -1,3 +1,12 @@
+<?php
+require_once './process/config.php';
+session_start();
+
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -25,7 +34,7 @@
                             Back to Planning
                         </a>
 
-                        <form action="process_add_social.php" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
+                        <form action="process/process_add_social.php" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
                             
                             <div class="lg:col-span-1 space-y-6">
                                 <div class="space-y-4">
@@ -85,16 +94,16 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-3 ml-1">Initial Status</label>
-                                        <div class="flex gap-4">
-                                            <label class="flex-1 cursor-pointer">
-                                                <input type="radio" name="status" value="Draft" checked class="peer hidden">
-                                                <div class="text-center py-4 rounded-2xl border border-gray-100 bg-gray-50 peer-checked:bg-gray-200 peer-checked:text-brandPrimary font-bold text-[10px] uppercase transition-all">Save as Draft</div>
-                                            </label>
-                                            <label class="flex-1 cursor-pointer">
-                                                <input type="radio" name="status" value="Scheduled" class="peer hidden">
-                                                <div class="text-center py-4 rounded-2xl border border-gray-100 bg-gray-50 peer-checked:bg-brandGold peer-checked:text-white font-bold text-[10px] uppercase transition-all">Schedule Now</div>
-                                            </label>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Publication Status</label>
+                                        <div class="relative">
+                                            <select name="status" required class="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-brandGold outline-none transition font-bold text-sm appearance-none cursor-pointer text-brandPrimary">
+                                                <option value="Draft">Draft</option>
+                                                <option value="Scheduled">Scheduled</option>
+                                                <option value="Published">Published</option>
+                                            </select>
+                                            <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -114,7 +123,6 @@
         </div>
     </div>
 
-    <script src="assets/script.js"></script>
     <script>
         function previewThumb(input) {
             const preview = document.getElementById('thumb-prev');

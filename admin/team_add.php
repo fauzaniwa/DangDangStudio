@@ -30,7 +30,7 @@
                             Kembali ke Roster Tim
                         </a>
 
-                        <form action="process_add_team.php" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
+                        <form action="./process/process_add_team.php" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
                             
                             <div class="lg:col-span-1 space-y-4">
                                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-2">Foto Profil (3:4)</label>

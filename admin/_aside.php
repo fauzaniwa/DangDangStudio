@@ -1,3 +1,15 @@
+<?php
+// Pastikan session aktif sebelum mengambil data
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+/** * Mengambil role dari session. 
+ * Jika tidak ada (belum login/session hilang), 
+ * kita set default ke string kosong agar tidak error Undefined Variable.
+ */
+$current_role = isset($_SESSION['admin_role']) ? $_SESSION['admin_role'] : ''; 
+?>
 <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-brandPrimary text-white transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col shadow-2xl">
 
     <div class="p-6 border-b border-white/10">
@@ -19,6 +31,7 @@
             <span class="ml-3 font-semibold text-sm">Dashboard Overview</span>
         </a>
 
+        <?php if ($current_role === 'Super Admin'): ?>
         <div class="pb-4">
             <p class="px-4 text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">Project & Finance</p>
             <div class="space-y-1">
@@ -39,7 +52,9 @@
                 <?php endforeach; ?>
             </div>
         </div>
+        <?php endif; ?>
 
+        <?php if (in_array($current_role, ['Super Admin', 'Editor'])): ?>
         <div class="pb-4 border-t border-white/5 pt-4">
             <p class="px-4 text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">Content Management</p>
             <div class="space-y-1">
@@ -61,7 +76,9 @@
                 <?php endforeach; ?>
             </div>
         </div>
+        <?php endif; ?>
 
+        <?php if ($current_role === 'Super Admin'): ?>
         <div class="pb-4 border-t border-white/5 pt-4">
             <p class="px-4 text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">Systems</p>
             <div class="space-y-1">
@@ -80,6 +97,7 @@
                 </a>
             </div>
         </div>
+        <?php endif; ?>
 
         <div class="pt-4 border-t border-white/5">
             <a href="logout.php" class="flex items-center p-3 rounded-xl text-red-400 hover:bg-red-500/10 transition group">

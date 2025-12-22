@@ -9,9 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
 </head>
-<body class="bg-brandPrimary min-h-screen flex items-center justify-center p-6 py-12 relative overflow-hidden">
+<body class="bg-brandPrimary min-h-screen flex items-center justify-center p-6 py-12 relative overflow-y-auto">
     
-    <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+    <div class="fixed top-0 left-0 w-full h-full opacity-10 pointer-events-none z-0">
         <div class="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-brandTeal rounded-full blur-[100px]"></div>
         <div class="absolute bottom-[10%] left-[-5%] w-[30%] h-[30%] bg-brandAccent rounded-full blur-[100px]"></div>
     </div>
@@ -22,11 +22,24 @@
             <p class="text-blue-100/50 text-sm mt-2 font-medium">Buat kredensial admin baru untuk DangDang Studio.</p>
         </div>
 
+        <?php if(isset($_GET['error'])): ?>
+            <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-2xl text-red-200 text-sm font-bold flex items-center gap-3 animate-pulse">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>
+                    <?php 
+                        if($_GET['error'] == 'invalid_code') echo "Access Code tidak valid atau sudah tidak aktif!";
+                        elseif($_GET['error'] == 'email_exists') echo "Email ini sudah terdaftar di sistem!";
+                        else echo "Terjadi kesalahan pada sistem, coba lagi nanti.";
+                    ?>
+                </span>
+            </div>
+        <?php endif; ?>
+
         <div class="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[48px] p-8 md:p-10 shadow-2xl">
-            <form action="process_register.php" method="POST" class="space-y-5">
+            <form action="./process/process_register.php" method="POST" class="space-y-5">
                 <div>
                     <label class="block text-[10px] font-bold text-blue-200/60 uppercase tracking-widest mb-2 ml-1">Full Name</label>
-                    <input type="text" name="fullname" required placeholder="John Doe" 
+                    <input type="text" name="fullname" required placeholder="Contoh: Aditya Pratama" 
                            class="w-full px-6 py-4 rounded-2xl border border-white/10 bg-white/5 focus:bg-white focus:border-brandGold outline-none transition font-bold text-white focus:text-brandPrimary">
                 </div>
 
@@ -37,9 +50,15 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold text-blue-200/60 uppercase tracking-widest mb-2 ml-1">Access Code</label>
-                    <input type="text" name="access_code" required placeholder="Studio Auth Code" 
-                           class="w-full px-6 py-4 rounded-2xl border-brandGold/30 bg-brandGold/5 focus:bg-white focus:border-brandGold outline-none transition font-black text-brandGold uppercase placeholder:text-brandGold/30">
+                    <label class="block text-[10px] font-bold text-blue-200/60 uppercase tracking-widest mb-2 ml-1">Create Password</label>
+                    <input type="password" name="password" required placeholder="Minimal 8 karakter" 
+                           class="w-full px-6 py-4 rounded-2xl border border-white/10 bg-white/5 focus:bg-white focus:border-brandGold outline-none transition font-bold text-white focus:text-brandPrimary">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-brandGold uppercase tracking-widest mb-2 ml-1">Studio Access Code</label>
+                    <input type="text" name="access_code" required placeholder="Input Auth Code" 
+                           class="w-full px-6 py-4 rounded-2xl border border-brandGold/30 bg-brandGold/5 focus:bg-white focus:border-brandGold outline-none transition font-black text-brandGold uppercase placeholder:text-brandGold/30 text-center tracking-[0.2em]">
                 </div>
 
                 <div class="pt-4">
