@@ -1,20 +1,57 @@
 <?php
 require_once 'process/config.php';
 session_start();
+
+// 1. Proteksi Admin
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// 2. Ambil dan Validasi ID dari URL
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+if ($id <= 0) {
+    header("Location: project_timeline.php?status=error&msg=Invalid Project ID");
+    exit();
+}
+
+// 3. Ambil data dengan Prepared Statement
+$stmt = $conn->prepare("SELECT * FROM project_timelines WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $result->num_rows > 0) {
+    $data = $result->fetch_assoc();
+} else {
+    header("Location: project_timeline.php?status=error&msg=Project not found in database");
+    exit();
+}
+
+// 4. Inisialisasi variabel untuk menghindari error Undefined Index / Null
+$project_name  = $data['project_name'] ?? '';
+$client_id     = $data['client_id'] ?? '';
+$priority      = $data['priority'] ?? 'Normal';
+$deadline_date = $data['deadline_date'] ?? '';
+$deadline_time = $data['deadline_time'] ?? '';
+$brief_link    = $data['brief_link'] ?? '';
+$color_label   = $data['color_label'] ?? 'brandTeal';
+$notes         = $data['notes'] ?? '';
+$team_tags     = json_decode($data['team_tags'] ?? '[]', true) ?: [];
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Task - DangDang Studio</title>
+    <title>Edit Task - DangDang Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="assets/tailwind-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
 </head>
-
 <body class="bg-gray-50 text-slate-800">
 
     <div class="flex flex-col h-screen overflow-hidden">
@@ -31,23 +68,24 @@ session_start();
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
-                        Back to Timeline
+                        Discard & Back
                     </a>
 
                     <div class="max-w-4xl bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
                         <div class="p-8 border-b border-gray-50 bg-gradient-to-r from-white to-gray-50/50">
-                            <h1 class="text-2xl font-bold text-brandPrimary">Create New Task</h1>
-                            <p class="text-sm text-gray-500 font-medium">Atur jadwal dan detail pekerjaan tim Anda.</p>
+                            <h1 class="text-2xl font-bold text-brandPrimary">Edit Task Details</h1>
+                            <p class="text-sm text-gray-500 font-medium">Updating project: <span class="text-brandAccent"><?php echo htmlspecialchars($project_name); ?></span></p>
                         </div>
 
-                        <form action="process/process_add_timeline.php" method="POST" class="p-8 space-y-8">
+                        <form action="process/process_edit_timeline.php" method="POST" class="p-8 space-y-8">
+                            <input type="hidden" name="id" value="<?php echo $id; ?>">
                             
                             <div class="space-y-4">
                                 <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-brandTeal">General Information</h2>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="md:col-span-2">
                                         <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Project Name</label>
-                                        <input type="text" name="project_name" required placeholder="e.g. Branding Identity DangDang"
+                                        <input type="text" name="project_name" required value="<?php echo htmlspecialchars($project_name); ?>"
                                             class="w-full px-5 py-3 rounded-2xl border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-brandPrimary focus:ring-4 focus:ring-brandPrimary/5 outline-none transition">
                                     </div>
                                     <div>
@@ -57,7 +95,8 @@ session_start();
                                             <?php
                                             $client_query = mysqli_query($conn, "SELECT id, company_name FROM clients ORDER BY company_name ASC");
                                             while($row = mysqli_fetch_assoc($client_query)) {
-                                                echo "<option value='{$row['id']}'>{$row['company_name']}</option>";
+                                                $selected = ($row['id'] == $client_id) ? 'selected' : '';
+                                                echo "<option value='{$row['id']}' $selected>{$row['company_name']}</option>";
                                             }
                                             ?>
                                         </select>
@@ -65,9 +104,9 @@ session_start();
                                     <div>
                                         <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Task Priority</label>
                                         <select name="priority" class="w-full px-5 py-3 rounded-2xl border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-brandPrimary outline-none transition appearance-none text-sm font-bold">
-                                            <option value="Normal">🟢 Normal</option>
-                                            <option value="Medium">🟡 Medium</option>
-                                            <option value="High">🔴 High / Urgent</option>
+                                            <option value="Normal" <?php echo $priority == 'Normal' ? 'selected' : ''; ?>>Normal</option>
+                                            <option value="Medium" <?php echo $priority == 'Medium' ? 'selected' : ''; ?>>Medium</option>
+                                            <option value="High" <?php echo $priority == 'High' ? 'selected' : ''; ?>>High / Urgent</option>
                                         </select>
                                     </div>
                                 </div>
@@ -80,17 +119,17 @@ session_start();
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Deadline Date</label>
-                                        <input type="date" name="deadline_date" required
+                                        <input type="date" name="deadline_date" required value="<?php echo $deadline_date; ?>"
                                             class="w-full px-5 py-3 rounded-2xl border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-brandGold outline-none transition">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Deadline Time</label>
-                                        <input type="time" name="deadline_time" required
+                                        <input type="time" name="deadline_time" required value="<?php echo !empty($deadline_time) ? date('H:i', strtotime($deadline_time)) : '00:00'; ?>"
                                             class="w-full px-5 py-3 rounded-2xl border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-brandGold outline-none transition">
                                     </div>
                                     <div class="md:col-span-2">
                                         <label class="block text-xs font-bold text-gray-400 mb-2 uppercase text-brandAccent">Brief Link (Google Drive / Notion)</label>
-                                        <input type="url" name="brief_link" placeholder="https://drive.google.com/..."
+                                        <input type="url" name="brief_link" value="<?php echo htmlspecialchars($brief_link); ?>" placeholder="https://drive.google.com/..."
                                             class="w-full px-5 py-3 rounded-2xl border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-brandGold outline-none transition">
                                     </div>
                                 </div>
@@ -100,19 +139,15 @@ session_start();
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <div class="flex items-center justify-between mb-4">
-                                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Assign Team</label>
-                                        <button type="button" onclick="openModalTeam()" class="text-[10px] font-bold text-brandPrimary hover:text-brandTeal flex items-center gap-1 transition-all">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                                            ADD NEW TEAM
-                                        </button>
-                                    </div>
+                                    <label class="block text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Assign Team</label>
                                     <div id="team-checkbox-container" class="grid grid-cols-2 gap-3">
                                         <?php
                                         $team_query = mysqli_query($conn, "SELECT * FROM teams ORDER BY team_name ASC");
-                                        while ($team = mysqli_fetch_assoc($team_query)) : ?>
+                                        while ($team = mysqli_fetch_assoc($team_query)) : 
+                                            $checked = in_array($team['id'], $team_tags) ? 'checked' : '';
+                                        ?>
                                             <label class="relative flex items-center group cursor-pointer">
-                                                <input type="checkbox" name="team_tag[]" value="<?php echo $team['id']; ?>" class="peer hidden">
+                                                <input type="checkbox" name="team_tag[]" value="<?php echo $team['id']; ?>" class="peer hidden" <?php echo $checked; ?>>
                                                 <div class="w-full p-3 rounded-2xl border border-gray-100 bg-gray-50/50 peer-checked:border-brandPrimary peer-checked:bg-white peer-checked:shadow-sm transition-all flex items-center gap-2 text-[10px] font-bold text-gray-400 peer-checked:text-brandPrimary uppercase">
                                                     <div class="w-2 h-2 rounded-full <?php echo $team['color_class']; ?>"></div>
                                                     <?php echo htmlspecialchars($team['team_name']); ?>
@@ -127,10 +162,12 @@ session_start();
                                     <div class="flex gap-4">
                                         <?php 
                                         $labels = ['brandTeal', 'brandGold', 'brandAccent', 'brandPrimary'];
-                                        foreach($labels as $color): ?>
+                                        foreach($labels as $color_opt): 
+                                            $checked_radio = ($color_label == $color_opt) ? 'checked' : '';
+                                        ?>
                                             <label class="cursor-pointer">
-                                                <input type="radio" name="color_label" value="<?php echo $color; ?>" class="hidden peer" <?php echo $color == 'brandTeal' ? 'checked' : ''; ?>>
-                                                <div class="w-12 h-12 rounded-2xl bg-<?php echo $color; ?> border-4 border-transparent peer-checked:border-white peer-checked:ring-4 peer-checked:ring-<?php echo $color; ?>/20 shadow-lg transition-all hover:scale-110"></div>
+                                                <input type="radio" name="color_label" value="<?php echo $color_opt; ?>" class="hidden peer" <?php echo $checked_radio; ?>>
+                                                <div class="w-12 h-12 rounded-2xl bg-<?php echo $color_opt; ?> border-4 border-transparent peer-checked:border-white peer-checked:ring-4 peer-checked:ring-<?php echo $color_opt; ?>/20 shadow-lg transition-all hover:scale-110"></div>
                                             </label>
                                         <?php endforeach; ?>
                                     </div>
@@ -139,14 +176,13 @@ session_start();
 
                             <div class="pt-4">
                                 <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Project Notes / Instructions</label>
-                                <textarea name="notes" rows="5" placeholder="Tuliskan detail pekerjaan atau catatan khusus untuk tim di sini..."
-                                    class="w-full px-5 py-4 rounded-[24px] border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-brandPrimary outline-none transition text-sm leading-relaxed"></textarea>
+                                <textarea name="notes" rows="5" class="w-full px-5 py-4 rounded-[24px] border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-brandPrimary outline-none transition text-sm leading-relaxed"><?php echo htmlspecialchars($notes); ?></textarea>
                             </div>
 
                             <div class="flex items-center justify-end gap-4 pt-6">
-                                <button type="reset" class="px-6 py-3 text-sm font-bold text-gray-400 hover:text-brandAccent transition">Discard</button>
+                                <a href="project_timeline.php" class="px-6 py-3 text-sm font-bold text-gray-400 hover:text-brandAccent transition">Cancel</a>
                                 <button type="submit" class="px-10 py-4 bg-brandPrimary text-white rounded-2xl font-bold shadow-xl shadow-brandPrimary/20 hover:scale-105 active:scale-95 transition-all">
-                                    Publish to Timeline
+                                    Update Timeline
                                 </button>
                             </div>
                         </form>
@@ -157,68 +193,5 @@ session_start();
             </main>
         </div>
     </div>
-
-    <div id="modal-add-team" class="fixed inset-0 z-[110] hidden overflow-y-auto">
-        <div class="fixed inset-0 bg-brandPrimary/40 backdrop-blur-sm transition-opacity" onclick="closeModalTeam()"></div>
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative transform overflow-hidden rounded-[32px] bg-white p-8 text-left shadow-2xl transition-all w-full max-w-md">
-                <h3 class="text-xl font-bold text-brandPrimary mb-1">Add New Team</h3>
-                <p class="text-sm text-gray-500 mb-6">Create a new department category.</p>
-                <form id="form-add-team" class="space-y-5">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Team Name</label>
-                        <input type="text" id="new_team_name" required placeholder="e.g. Motion Graphic" 
-                            class="w-full px-5 py-3 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-brandPrimary outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-3">Pick Team Color</label>
-                        <div class="grid grid-cols-5 gap-3">
-                            <?php 
-                            $colors = ['bg-brandTeal', 'bg-brandGold', 'bg-brandAccent', 'bg-brandPrimary', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-blue-500', 'bg-indigo-500', 'bg-slate-800'];
-                            foreach($colors as $index => $color): ?>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="new_team_color" value="<?php echo $color; ?>" class="hidden peer" <?php echo $index === 0 ? 'checked' : ''; ?>>
-                                    <div class="w-full aspect-square rounded-xl <?php echo $color; ?> border-4 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-gray-200 transition-all hover:scale-110"></div>
-                                </label>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" onclick="closeModalTeam()" class="flex-1 py-4 bg-gray-50 text-gray-400 rounded-2xl font-bold hover:bg-gray-100 transition">Cancel</button>
-                        <button type="submit" class="flex-1 py-4 bg-brandPrimary text-white rounded-2xl font-bold shadow-lg shadow-brandPrimary/20 transition-all text-center">Save Team</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function openModalTeam() {
-            document.getElementById('modal-add-team').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModalTeam() {
-            document.getElementById('modal-add-team').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        document.getElementById('form-add-team').onsubmit = function(e) {
-            e.preventDefault();
-            const name = document.getElementById('new_team_name').value;
-            const color = document.querySelector('input[name="new_team_color"]:checked').value;
-
-            fetch('process/process_ajax_add_team.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `name=${encodeURIComponent(name)}&color=${encodeURIComponent(color)}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) { location.reload(); }
-                else { alert("Error: " + data.message); }
-            });
-        };
-    </script>
 </body>
 </html>

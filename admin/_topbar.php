@@ -58,3 +58,33 @@ $display_initials = strtoupper(substr($initials, 0, 2));
         </div>
     </div>
 </div>
+<script>
+    const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+function toggleMenu() {
+  sidebar.classList.toggle("-translate-x-full");
+  overlay.classList.toggle("hidden");
+}
+
+menuBtn.addEventListener("click", toggleMenu);
+overlay.addEventListener("click", toggleMenu);
+
+// Dropdown Profile Logic
+const profileBtn = document.getElementById("profileBtn");
+const dropdownMenu = document.getElementById("dropdownMenu");
+
+// Toggle dropdown saat tombol diklik
+profileBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // Mencegah event bubbling
+  dropdownMenu.classList.toggle("hidden");
+});
+
+// Menutup dropdown jika user mengklik di mana saja di luar menu
+window.addEventListener("click", (e) => {
+  if (!profileBtn.contains(e.target)) {
+    dropdownMenu.classList.add("hidden");
+  }
+});
+</script>
