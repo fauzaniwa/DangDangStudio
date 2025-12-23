@@ -89,7 +89,7 @@ $q_partners = fetchSafe($conn, "SELECT * FROM partners ORDER BY created_at DESC"
             </div>
             <div class="relative mt-10 lg:mt-0">
                 <div class="aspect-square bg-brandTeal rounded-4xl md:rounded-5xl overflow-hidden rotate-2 md:rotate-3 shadow-2xl">
-                    <img src="https://studiodangdang.com/img/dangdang%201.png" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-1000" alt="Creative Visual">
+                    <img src="https://studiodangdang.com/public/assets/img/thb_pacujalur.png" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-1000" alt="Creative Visual">
                 </div>
                 <div class="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 bg-brandGold p-6 md:p-10 rounded-3xl md:rounded-4xl shadow-2xl">
                     <p class="text-3xl md:text-4xl font-black italic leading-none">100%</p>
