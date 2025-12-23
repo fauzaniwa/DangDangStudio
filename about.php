@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dang Creative Media</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'studio-orange': '#F9A21F',
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://unpkg.com/aos@2.3.1/dist/dist/aos.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
@@ -17,6 +28,7 @@
             background-color: #fff;
             color: #000;
         }
+
 
         /* Kursor di-invert: border hitam tipis */
         #cursor {
@@ -120,8 +132,8 @@
         </div>
     </section>
 
-    <section class="bg-white flex items-center px-8 md:px-24 lg:px-64 py-32">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start">
+    <section class="bg-white flex items-center px-8 md:px-24 lg:px-64 py-32 ">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start max-w-7xl mx-auto">
 
             <div data-aos="fade-right">
                 <p class="text-2xl md:text-4xl font-light leading-tight text-black">
@@ -135,28 +147,22 @@
                         We are always looking for the right method to build a strong foundation that is right for you. Shaping and refining it to help you achieve a brand that lasts.
                     </p>
                 </div>
-
-                <div data-aos="fade-up" data-aos-delay="400">
-                    <a href="#" class="inline-block text-sm font-bold uppercase tracking-widest border-b border-black pb-2 hover:text-gray-400 transition text-black">
-                        Read Our Credentials
-                    </a>
-                </div>
             </div>
 
         </div>
     </section>
 
-    <section class="bg-white px-8 md:px-24 lg:px-64 py-32 border-t border-black/5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
+    <section class="bg-studio-orange px-8 md:px-24 lg:px-64 py-32 border-t border-black/5">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
             <div class="flex flex-col justify-between h-full">
                 <h3 data-aos="fade-right" class="text-6xl font-bold tracking-tighter uppercase text-black">Services</h3>
-                <p data-aos="fade-up" class="text-sm text-gray-400 max-w-xs leading-relaxed">
+                <p data-aos="fade-up" class="text-sm text-white max-w-xs leading-relaxed">
                     We work in diverse mediums. Often collaborating with our colleagues from various disciplines to produce noteworthy outcomes.
                 </p>
             </div>
-            <div class="space-y-16">
+            <div class="space-y-16 text-left">
                 <div data-aos="fade-up">
-                    <h4 class="text-gray-400 uppercase text-xs font-bold tracking-widest mb-6">Interactive Strategy:</h4>
+                    <h4 class="text-white uppercase text-xs font-bold tracking-widest mb-6">Interactive Strategy:</h4>
                     <ul class="text-2xl md:text-3xl space-y-3 font-medium text-black">
                         <li class="hover:translate-x-3 transition duration-300">Games Strategy</li>
                         <li class="hover:translate-x-3 transition duration-300">Gamification Flow</li>
@@ -165,7 +171,7 @@
                     </ul>
                 </div>
                 <div data-aos="fade-up">
-                    <h4 class="text-gray-400 uppercase text-xs font-bold tracking-widest mb-6">Production:</h4>
+                    <h4 class="text-white uppercase text-xs font-bold tracking-widest mb-6">Production:</h4>
                     <ul class="text-2xl md:text-3xl space-y-3 font-medium text-black">
                         <li class="hover:translate-x-3 transition duration-300">2D/3D Animation</li>
                         <li class="hover:translate-x-3 transition duration-300">Motion Graphics</li>
@@ -177,10 +183,10 @@
         </div>
     </section>
 
-    <section class="py-32 px-8 md:px-24 lg:px-64 bg-white text-black border-t border-gray-100">
+    <section class="py-32 px-8 md:px-24 lg:px-64 bg-white text-black border-t border-gray-100 ">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-                <div data-aos="fade-right">
+                <div data-aos="fade-right" class="">
                     <h2 class="text-xs font-bold tracking-[0.5em] text-gray-400 uppercase mb-3">Expertise</h2>
                     <h3 class="text-5xl font-black uppercase tracking-tighter">Our Team</h3>
                 </div>
@@ -253,100 +259,174 @@
             core: [{
                     name: "Aang",
                     role: "Founder / Lead",
-                    img: "assets/img/team_1.png",
-                    scale: "1.15",
-                    top: "50%"
+                    img: "assets/img/team/team_1.jpg",
+
                 },
                 {
                     name: "Member 2",
                     role: "Producer",
-                    img: "assets/img/team_2.png",
-                    scale: "1.0",
-                    top: "-20%"
+                    img: "assets/img/team/team_2.jpg",
+
                 },
                 {
                     name: "Member 3",
                     role: "Creative Director",
-                    img: "assets/img/team_3.png",
-                    scale: "1.3",
-                    top: "80%"
+                    img: "assets/img/team/team_3.jpg",
+
                 },
                 {
                     name: "Member 4",
                     role: "Art Director",
-                    img: "assets/img/team_4.png",
-                    scale: "1.5",
-                    top: "20%"
+                    img: "assets/img/team/team_4.jpg",
+
                 },
                 {
                     name: "Member 5",
                     role: "Operations",
-                    img: "assets/img/team_5.png",
-                    scale: "1.0",
-                    top: "0%"
+                    img: "assets/img/team/team_5.jpg",
+
                 }
             ],
             game: [{
+                    name: "Aang",
+                    role: "Founder / Lead",
+                    img: "assets/img/team/team_1.jpg",
+
+                },
+                {
+                    name: "Member 2",
+                    role: "Producer",
+                    img: "assets/img/team/team_2.jpg",
+
+                },
+                {
+                    name: "Member 3",
+                    role: "Creative Director",
+                    img: "assets/img/team/team_3.jpg",
+
+                },
+                {
+                    name: "Member 4",
+                    role: "Art Director",
+                    img: "assets/img/team/team_4.jpg",
+
+                },
+                {
+                    name: "Member 5",
+                    role: "Operations",
+                    img: "assets/img/team/team_5.jpg",
+
+                },
+                {
                     name: "Game Dev 1",
                     role: "Unity Dev",
-                    img: "assets/img/team_g1.png",
-                    scale: "1.7",
-                    top: "5%"
+                    img: "assets/img/team/team_g1.jpg",
+
                 },
                 {
                     name: "Game Dev 2",
                     role: "Game Designer",
-                    img: "assets/img/team_g2.png",
-                    scale: "1.0",
-                    top: "0%"
+                    img: "assets/img/team/team_g2.jpg",
+
+                }, {
+                    name: "Game Dev 2",
+                    role: "Game Designer",
+                    img: "assets/img/team/team_g3.jpg",
+
                 }
             ],
             animation: [{
                     name: "Anim 1",
                     role: "2D Animator",
-                    img: "assets/img/team_a1.png",
-                    scale: "1.2",
-                    top: "10%"
+                    img: "assets/img/team/team_a1.jpg",
+
                 },
                 {
                     name: "Anim 2",
                     role: "3D Modeler",
-                    img: "assets/img/team_a2.png",
-                    scale: "1.0",
-                    top: "0%"
-                }
+                    img: "assets/img/team/team_a2.jpg",
+
+                },
+                {
+                    name: "Anim 1",
+                    role: "2D Animator",
+                    img: "assets/img/team/team_a3.jpg",
+
+                },
+                {
+                    name: "Anim 2",
+                    role: "3D Modeler",
+                    img: "assets/img/team/team_a4.jpg",
+
+                },
+                {
+                    name: "Anim 2",
+                    role: "3D Modeler",
+                    img: "assets/img/team/team_a5.jpg",
+
+                },
+                {
+                    name: "Anim 2",
+                    role: "3D Modeler",
+                    img: "assets/img/team/team_a6.jpg",
+
+                },
+                {
+                    name: "Anim 2",
+                    role: "3D Modeler",
+                    img: "assets/img/team/team_a7.jpg",
+
+                },
             ]
         };
 
         function filterTeam(category) {
             const grid = document.getElementById('team-grid');
             const buttons = document.querySelectorAll('.team-tab');
+
+            // 1. Update Button Style (Tanpa Delay)
             buttons.forEach(btn => {
                 btn.classList.remove('active-tab');
                 if (btn.getAttribute('onclick').includes(category)) btn.classList.add('active-tab');
             });
 
+            // 2. Efek Fade Out: Turunkan opacity grid sebelum ganti data
+            grid.style.transition = "opacity 0.4s ease"; // Memastikan transisi smooth
             grid.style.opacity = 0;
+
             setTimeout(() => {
                 grid.innerHTML = '';
-                (teamData[category] || []).forEach(m => {
+                const members = teamData[category] || [];
+
+                members.forEach((m, index) => {
+                    // 3. Tambahkan data-aos-delay dinamis agar foto muncul bergantian (staggered)
+                    const delay = index * 100;
+
                     grid.innerHTML += `
-                <div class="member-card shadow-sm" data-aos="fade-up">
-                    <div class="img-container">
-                        <img src="${m.img}" 
-                             class="member-img" 
-                             style="transform: scale(${m.scale || '1'}); object-position: center ${m.top || '0%'};" 
-                             alt="${m.name}"
-                             onerror="this.src='https://via.placeholder.com/400x500?text=Photo'">
-                    </div>
-                    <div class="member-info">
-                        <h4 class="text-white font-bold uppercase text-base tracking-tighter">${m.name}</h4>
-                        <p class="text-white/60 text-[10px] uppercase tracking-[0.2em] mt-2">${m.role}</p>
-                    </div>
-                </div>`;
+            <div class="member-card shadow-sm" data-aos="fade-up" data-aos-delay="${delay}">
+                <div class="img-container">
+                    <img src="${m.img}" 
+                         class="member-img" 
+                         style="transform: scale(${m.scale || '1'}); object-position: center ${m.top || '0%'};" 
+                         alt="${m.name}"
+                         onerror="this.src='https://via.placeholder.com/400x500?text=Photo'">
+                </div>
+                <div class="member-info">
+                    <h4 class="text-white font-bold uppercase text-base tracking-tighter">${m.name}</h4>
+                    <p class="text-white/60 text-[10px] uppercase tracking-[0.2em] mt-2">${m.role}</p>
+                </div>
+            </div>`;
                 });
+
+                // 4. Refresh AOS agar animasi baru terpicu untuk elemen yang baru dirender
+                if (window.AOS) {
+                    AOS.refreshHard();
+                }
+
+                // 5. Efek Fade In: Kembalikan opacity grid
                 grid.style.opacity = 1;
-            }, 300);
+
+            }, 400); // Durasi timeout disamakan dengan durasi transisi CSS
         }
         window.onload = () => filterTeam('core');
     </script>
