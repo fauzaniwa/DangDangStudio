@@ -163,9 +163,11 @@ for ($i = 11; $i >= 0; $i--) {
                         </div>
                         <div class="flex gap-3">
                             <button class="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition">Export PDF</button>
-                            <button onclick="toggleModal()" class="px-5 py-2.5 bg-brandPrimary text-white rounded-xl text-sm font-bold shadow-lg shadow-brandPrimary/20 hover:scale-105 transition-all">
+
+
+                            <a href="financial_report_add.php" class="px-5 py-2.5 bg-brandPrimary text-white rounded-xl text-sm font-bold shadow-lg shadow-brandPrimary/20 hover:scale-105 transition-all inline-block">
                                 + Add Transaction
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -253,7 +255,7 @@ for ($i = 11; $i >= 0; $i--) {
                                             <td class="px-8 py-5">
                                                 <div class="flex justify-center items-center gap-3">
                                                     <?php if (!empty($tx['attachment'])): ?>
-                                                        <a href="../uploads/finance/<?php echo $tx['attachment']; ?>" target="_blank" title="View Proof" class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-brandPrimary hover:text-white transition-all shadow-sm">
+                                                        <a href="uploads/finance/<?php echo $tx['attachment']; ?>" target="_blank" title="View Proof" class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-brandPrimary hover:text-white transition-all shadow-sm">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -263,11 +265,11 @@ for ($i = 11; $i >= 0; $i--) {
                                                         <span class="text-[9px] text-gray-300 italic font-bold">No Proof</span>
                                                     <?php endif; ?>
 
-                                                    <button onclick='openEditModal(<?php echo json_encode($tx); ?>)' class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Edit">
+                                                    <a href="financial_report_edit.php?id=<?php echo $tx['id']; ?>" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Edit">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                                         </svg>
-                                                    </button>
+                                                    </a>
 
                                                     <button onclick="openDeleteModal(<?php echo $tx['id']; ?>, '<?php echo htmlspecialchars($tx['description']); ?>')"
                                                         class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Delete">

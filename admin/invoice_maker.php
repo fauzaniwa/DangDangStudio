@@ -51,7 +51,68 @@ $invoices_result = mysqli_query($conn, $sql_list);
                 <?php include_once '_topbar.php'; ?>
 
                 <div class="p-6 md:p-10 flex-1">
+                    <?php if (isset($_GET['status'])): ?>
+                        <div id="feedback-alert" class="mb-8 animate-fade-in">
+
+                            <?php if ($_GET['status'] == 'success'): ?>
+                                <div class="flex items-center gap-4 p-5 bg-emerald-50 border border-emerald-100 rounded-[24px]">
+                                    <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-emerald-800">Invoice Dibuat!</h4>
+                                        <p class="text-xs text-emerald-600/80 font-medium">Invoice baru telah berhasil diterbitkan dan tersimpan di sistem.</p>
+                                    </div>
+                                    <button onclick="this.parentElement.remove()" class="ml-auto text-emerald-400 hover:text-emerald-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                            <?php elseif ($_GET['status'] == 'success_edit'): ?>
+                                <div class="flex items-center gap-4 p-5 bg-blue-50 border border-blue-100 rounded-[24px]">
+                                    <div class="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-blue-800">Invoice Diperbarui</h4>
+                                        <p class="text-xs text-blue-600/80 font-medium">Perubahan data invoice telah berhasil disimpan dengan aman.</p>
+                                    </div>
+                                    <button onclick="this.parentElement.remove()" class="ml-auto text-blue-400 hover:text-blue-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                            <?php elseif ($_GET['status'] == 'deleted'): ?>
+                                <div class="flex items-center gap-4 p-5 bg-gray-100 border border-gray-200 rounded-[24px]">
+                                    <div class="w-12 h-12 bg-slate-600 rounded-2xl flex items-center justify-center text-white">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">Invoice Dihapus</h4>
+                                        <p class="text-xs text-slate-500 font-medium">Data invoice telah dihapus secara permanen dari sistem.</p>
+                                    </div>
+                                    <button onclick="this.parentElement.remove()" class="ml-auto text-slate-400 hover:text-slate-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
+                    <?php endif; ?>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+
                         <div>
                             <h1 class="text-2xl font-bold text-brandPrimary">Invoice Manager</h1>
                             <p class="text-sm text-gray-500">Pantau status pembayaran dan kelola bukti transaksi klien.</p>
@@ -133,12 +194,19 @@ $invoices_result = mysqli_query($conn, $sql_list);
                                             </td>
                                             <td class="px-6 py-5">
                                                 <div class="flex justify-center gap-2">
+                                                    <a href="invoice_edit.php?id=<?php echo $inv['id']; ?>" class="p-2 text-gray-400 hover:text-brandPrimary transition">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
+                                                    </a>
+
                                                     <button onclick="toggleStatusModal('<?php echo $inv['id']; ?>', '<?php echo $status; ?>')"
                                                         class="p-2 text-gray-400 hover:text-brandGold transition">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                         </svg>
                                                     </button>
+
                                                     <a href="invoice_view.php?id=<?php echo $inv['id']; ?>" target="_blank" class="p-2 text-gray-400 hover:text-brandTeal transition">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -227,74 +295,74 @@ $invoices_result = mysqli_query($conn, $sql_list);
 
 
     <script>
-    function toggleStatusModal(id = '', currentStatus = '') {
-        const modal = document.getElementById('statusModal');
-        const select = document.getElementById('statusSelect');
-        
-        if (id) {
-            document.getElementById('modal_invoice_id').value = id;
-            select.value = currentStatus;
-            
-            // Reset Preview saat modal dibuka
-            resetPreview();
-            checkStatus(currentStatus);
-        }
-        modal.classList.toggle('hidden');
-    }
+        function toggleStatusModal(id = '', currentStatus = '') {
+            const modal = document.getElementById('statusModal');
+            const select = document.getElementById('statusSelect');
 
-    function checkStatus(val) {
-        const proofSection = document.getElementById('proofSection');
-        const fileInput = document.getElementById('fileInput');
-        
-        if (val === 'paid') {
-            proofSection.classList.remove('hidden');
-            fileInput.required = true;
-        } else {
-            proofSection.classList.add('hidden');
-            fileInput.required = false;
-        }
-    }
+            if (id) {
+                document.getElementById('modal_invoice_id').value = id;
+                select.value = currentStatus;
 
-    function resetPreview() {
-        document.getElementById('previewContainer').classList.add('hidden');
-        document.getElementById('imagePreview').classList.add('hidden');
-        document.getElementById('pdfPreview').classList.add('hidden');
-        document.getElementById('fileName').textContent = "JPG, PNG or PDF (Max 2MB)";
-    }
-
-    // Mekanisme Preview File
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const container = document.getElementById('previewContainer');
-        const imgPrev = document.getElementById('imagePreview');
-        const pdfPrev = document.getElementById('pdfPreview');
-        const fileNameDisp = document.getElementById('fileName');
-
-        if (file) {
-            fileNameDisp.textContent = file.name;
-            container.classList.remove('hidden');
-
-            const reader = new FileReader();
-
-            if (file.type.startsWith('image/')) {
-                // Jika Gambar
-                reader.onload = function(event) {
-                    imgPrev.querySelector('img').src = event.target.result;
-                    imgPrev.classList.remove('hidden');
-                    pdfPrev.classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
-            } else if (file.type === 'application/pdf') {
-                // Jika PDF
-                document.getElementById('pdfName').textContent = file.name;
-                pdfPrev.classList.remove('hidden');
-                imgPrev.classList.add('hidden');
+                // Reset Preview saat modal dibuka
+                resetPreview();
+                checkStatus(currentStatus);
             }
-        } else {
-            resetPreview();
+            modal.classList.toggle('hidden');
         }
-    });
-</script>
+
+        function checkStatus(val) {
+            const proofSection = document.getElementById('proofSection');
+            const fileInput = document.getElementById('fileInput');
+
+            if (val === 'paid') {
+                proofSection.classList.remove('hidden');
+                fileInput.required = true;
+            } else {
+                proofSection.classList.add('hidden');
+                fileInput.required = false;
+            }
+        }
+
+        function resetPreview() {
+            document.getElementById('previewContainer').classList.add('hidden');
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('pdfPreview').classList.add('hidden');
+            document.getElementById('fileName').textContent = "JPG, PNG or PDF (Max 2MB)";
+        }
+
+        // Mekanisme Preview File
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const container = document.getElementById('previewContainer');
+            const imgPrev = document.getElementById('imagePreview');
+            const pdfPrev = document.getElementById('pdfPreview');
+            const fileNameDisp = document.getElementById('fileName');
+
+            if (file) {
+                fileNameDisp.textContent = file.name;
+                container.classList.remove('hidden');
+
+                const reader = new FileReader();
+
+                if (file.type.startsWith('image/')) {
+                    // Jika Gambar
+                    reader.onload = function(event) {
+                        imgPrev.querySelector('img').src = event.target.result;
+                        imgPrev.classList.remove('hidden');
+                        pdfPrev.classList.add('hidden');
+                    }
+                    reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                    // Jika PDF
+                    document.getElementById('pdfName').textContent = file.name;
+                    pdfPrev.classList.remove('hidden');
+                    imgPrev.classList.add('hidden');
+                }
+            } else {
+                resetPreview();
+            }
+        });
+    </script>
 </body>
 
 </html>

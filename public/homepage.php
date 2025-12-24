@@ -1,357 +1,410 @@
-<!doctype html>
-<html lang="en">
+<?php
+// homepage.php - Lokasi: /public/homepage.php
+require_once '../admin/process/config.php';
+
+// Data Fetching dengan Fallback jika query gagal/kosong
+function fetchSafe($conn, $query)
+{
+    $res = mysqli_query($conn, $query);
+    return ($res && mysqli_num_rows($res) > 0) ? $res : false;
+}
+
+$q_games = fetchSafe($conn, "SELECT * FROM games ORDER BY created_at DESC LIMIT 3");
+$q_articles = mysqli_query($conn, "SELECT * FROM articles WHERE status = 'published' ORDER BY created_at DESC LIMIT 3");
+$q_partners = fetchSafe($conn, "SELECT * FROM partners ORDER BY created_at DESC");
+?>
+
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dang Creative Media</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DangDang Studio | Animation & Game Experience</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/dist/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
-        }
-
-        #cursor {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.2s ease-out;
-            transform: translate(-50%, -50%);
-        }
-
-        /* FIX MARQUEE ANTI PATAH */
-        @keyframes marquee {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-100%);
-            }
-
-            /* Pakai -100% dari kontainer konten */
-        }
-
-        .marquee-container {
-            display: flex;
-            overflow: hidden;
-            user-select: none;
-            width: 100%;
-        }
-
-        .marquee-content {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-around;
-            min-width: 100%;
-            /* Pastikan lebar grup 1 dan 2 identik */
-            gap: 6rem;
-            padding: 0 3rem;
-            animation: marquee 25s linear infinite;
-        }
-
-        /* BENTO LAYOUT (SHARP CORNERS) */
-        @media (min-width: 1024px) {
-            .bento-grid-custom {
-                display: grid !important;
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-rows: repeat(4, 240px);
-                gap: 1.5rem;
-                grid-template-areas:
-                    "whoosh whoosh ovo"
-                    "whoosh whoosh peruri"
-                    "burgreens digital digital"
-                    "visious digital digital";
-            }
-        }
-
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .bento-grid-custom {
-                display: grid !important;
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(5, 220px);
-                gap: 1.25rem;
-                grid-template-areas: "whoosh whoosh" "whoosh whoosh" "ovo peruri" "burgreens visious" "digital digital";
-            }
-        }
-
-        @media (max-width: 767px) {
-            .bento-grid-custom {
-                display: flex !important;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .bento-grid-custom>div {
-                height: 320px;
-            }
-        }
-
-        .area-whoosh {
-            grid-area: whoosh;
-        }
-
-        .area-ovo {
-            grid-area: ovo;
-        }
-
-        .area-peruri {
-            grid-area: peruri;
-        }
-
-        .area-burgreens {
-            grid-area: burgreens;
-        }
-
-        .area-visious {
-            grid-area: visious;
-        }
-
-        .area-digital {
-            grid-area: digital;
-        }
-
-        /* BENTO HOVER REVEAL EFFECT */
-        .bento-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 0 !important;
-            width: 100%;
-            height: 100%;
-        }
-
-        .bento-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .bento-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 2rem;
-        }
-
-        .bento-item:hover .bento-overlay {
-            opacity: 1;
-        }
-
-        .bento-item:hover .bento-img {
-            transform: scale(1.08);
-        }
-
-        .bento-title {
-            align-self: flex-start;
-            font-weight: 700;
-            color: white;
-            font-size: 1.5rem;
-            line-height: 1.2;
-        }
-
-        .bento-category {
-            align-self: flex-start;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,700;0,800;1,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="assets/js/tailwind.config.js"></script>
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
-<body class="bg-white text-black overflow-x-hidden">
-    <div id="cursor" class="hidden md:block"></div>
+<body class="antialiased bg-mesh">
 
-    <section class="min-h-screen w-full flex flex-col justify-center px-8 md:px-24 lg:px-64 py-20 relative overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <img src="assets/img/landing_page.png" alt="Landing Background" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-white/30"></div>
-        </div>
-        <div class="max-w-4xl relative z-10">
-            <h2 data-aos="fade-up" class="text-xs font-bold tracking-[0.4em] text-gray-500 uppercase mb-4">DANG CREATIVE MEDIA</h2>
-            <h1 data-aos="fade-up" class="text-6xl md:text-8xl font-extrabold tracking-tighter leading-[0.9] mb-12 uppercase text-black">UNLEASH YOUR<br>IMAGINATION</h1>
-            <div data-aos="fade-up" data-aos-delay="300" class="grid grid-cols-1 md:grid-cols-2 gap-12 pt-12 border-t border-black/10">
-                <p class="text-lg font-semibold text-black leading-snug italic">Discover captivating worlds and embark on epic adventures with Aang.</p>
-                <p class="text-sm text-gray-600 leading-relaxed">Based in Bandung, we are a creative collective specializing in Games, Gamification, and Interactive Ads. We merge high-end Design with professional Animation to build digital experiences that truly play.</p>
+    <?php include_once '_navbar.php'; ?>
+
+    <section class="pt-48 pb-24 px-6 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+            <div class="space-y-8 relative z-10 text-center lg:text-left">
+                <div class="inline-flex items-center gap-3 bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100">
+                    <span class="flex h-2 w-2 rounded-full bg-brandTeal animate-pulse"></span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-brandTeal italic">2025 Creative Experience</span>
+                </div>
+                <h1 class="font-heading text-6xl md:text-8xl lg:text-[110px] font-extrabold leading-[0.85] tracking-tighter text-brandDark uppercase italic">
+                    Beyond <br> <span class="text-outline">Dreams.</span> <br> <span class="text-brandCoral">Imagined.</span>
+                </h1>
+                <p class="text-lg text-slate-500 max-w-md mx-auto lg:mx-0 font-medium leading-relaxed">
+                    Kami mendefinisikan ulang cara dunia bermain melalui desain animasi yang elegan dan teknologi game engine masa depan.
+                </p>
+                <div class="flex flex-wrap justify-center lg:justify-start gap-4">
+                    <a href="#contact" class="bg-brandCoral text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-brandCoral/30 hover:scale-105 transition transform">Start Project</a>
+                    <a href="#games" class="bg-white text-brandDark border border-slate-200 px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:border-brandTeal transition">Portfolio</a>
+                </div>
+            </div>
+
+            <div class="relative mt-16 lg:mt-0">
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-brandTeal/10 rounded-full blur-3xl"></div>
+                <div class="relative aspect-square bg-brandTeal rounded-[60px] overflow-hidden shadow-2xl animate-float">
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-1000" alt="Studio Visual">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brandDark/40 to-transparent"></div>
+                </div>
+                <div class="absolute -bottom-8 -left-8 bg-brandGold p-8 rounded-4xl shadow-2xl border-4 border-white">
+                    <p class="font-heading text-4xl font-black italic text-brandDark leading-none">100%</p>
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-brandDark/60 mt-1">Creative Soul</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="py-24 bg-white overflow-hidden border-y border-gray-50">
-        <div class="px-8 md:px-24 lg:px-64 mb-16 flex flex-col items-center text-center" data-aos="fade-up">
-            <h2 class="text-xl md:text-2xl font-black tracking-[0.3em] text-black uppercase">Previous Collaborations</h2>
-            <div class="h-1.5 w-24 bg-black mt-4"></div>
-        </div>
-        <div class="marquee-container">
-            <div class="marquee-content">
-                <img src="assets/img/client_gojek.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Gojek">
-                <img src="assets/img/client_iqos.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="IQOS">
-                <img src="assets/img/client_oriflame.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Oriflame">
-                <img src="assets/img/client_signature.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Signature">
-                <img src="assets/img/client_kemenkebud.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Kemenkebud">
-                <img src="assets/img/client_bi.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Bank Indonesia">
+    <section class="py-20 bg-white border-y border-slate-50 overflow-hidden">
+        <div class="relative flex overflow-x-hidden">
+            <div class="marquee-wrapper gap-24 items-center px-12">
+                <?php if ($q_partners): while ($p = mysqli_fetch_assoc($q_partners)): ?>
+                        <img src="../uploads/partners/<?= $p['partner_logo'] ?>" class="h-12 grayscale opacity-40 hover:opacity-100 hover:grayscale-0 transition cursor-pointer" alt="<?= $p['partner_name'] ?>">
+                    <?php endwhile;
+                else: ?>
+                    <span class="text-3xl font-black text-slate-100 uppercase italic tracking-tighter">DangDang Partners • Excellence • Visionary • 2025 • </span>
+                <?php endif; ?>
             </div>
-            <div class="marquee-content" aria-hidden="true">
-                <img src="assets/img/client_gojek.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Gojek">
-                <img src="assets/img/client_iqos.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="IQOS">
-                <img src="assets/img/client_oriflame.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Oriflame">
-                <img src="assets/img/client_signature.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Signature">
-                <img src="assets/img/client_kemenkebud.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Kemenkebud">
-                <img src="assets/img/client_bi.png" class="h-14 md:h-20 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer" alt="Bank Indonesia">
+            <div class="marquee-wrapper gap-24 items-center px-12" aria-hidden="true">
+                <?php // Repeat loop for seamless animation if data exists
+                if ($q_partners): mysqli_data_seek($q_partners, 0);
+                    while ($p = mysqli_fetch_assoc($q_partners)): ?>
+                        <img src="../uploads/partners/<?= $p['partner_logo'] ?>" class="h-12 grayscale opacity-40 hover:opacity-100 hover:grayscale-0 transition cursor-pointer" alt="<?= $p['partner_name'] ?>">
+                    <?php endwhile;
+                else: ?>
+                    <span class="text-3xl font-black text-slate-100 uppercase italic tracking-tighter">DangDang Partners • Excellence • Visionary • 2025 • </span>
+                <?php endif; ?>
             </div>
         </div>
     </section>
 
-    <section class="pt-12 pb-32 px-8 md:px-12 lg:px-64 bg-white">
-        <div class="mb-24 flex flex-col items-center text-center" data-aos="fade-up">
-            <h2 class="text-xs font-bold tracking-[0.5em] text-gray-400 uppercase mb-3">Selected Works</h2>
-            <h3 class="text-5xl md:text-6xl font-extrabold italic uppercase tracking-tighter text-black">2023 — 2025</h3>
-            <div class="h-1.5 w-24 bg-black mt-6"></div>
-        </div>
+    <section id="about" class="py-32 px-6">
         <div class="max-w-7xl mx-auto">
-            <div class="bento-grid-custom">
-                <div data-aos="fade-up" class="area-whoosh bento-item group cursor-pointer shadow-sm">
-                    <img src="assets/img/thb_pacujalur.png" class="bento-img" alt="Pacu Jalur">
-                    <div class="bento-overlay">
-                        <span class="bento-title">Pacu Jalur Game</span>
-                        <span class="bento-category">Game Development</span>
-                    </div>
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-8 bento-card bg-white p-12 md:p-20 rounded-[3rem] border border-slate-100 flex flex-col justify-between min-h-[450px]">
+                    <h2 class="font-heading text-4xl md:text-5xl font-extrabold uppercase italic leading-[1.1]">
+                        Kami adalah simfoni antara <span class="text-brandTeal underline decoration-brandGold">seni visual</span> & <span class="text-brandCoral">logika kode</span> tingkat tinggi.
+                    </h2>
+                    <p class="text-slate-500 font-medium text-lg max-w-2xl mt-12">
+                        Berbasis di Indonesia, DangDang Studio melayani pasar global dengan menciptakan pengalaman interaktif yang berfokus pada emosi pemain dan detail animasi yang presisi.
+                    </p>
                 </div>
-                <div data-aos="fade-up" data-aos-delay="100" class="area-ovo bento-item group cursor-pointer shadow-sm">
-                    <img src="assets/img/thb_home.png" class="bento-img" alt="Home">
-                    <div class="bento-overlay">
-                        <span class="bento-title">Home Hacks</span>
-                        <span class="bento-category">Game Development</span>
+                <div class="lg:col-span-4 grid grid-rows-2 gap-8">
+                    <div class="bg-brandDark p-12 rounded-[3rem] text-white flex flex-col justify-center items-center text-center bento-card">
+                        <p class="font-heading text-6xl font-black italic text-brandGold mb-2">50+</p>
+                        <p class="text-[10px] uppercase font-bold tracking-[0.3em] opacity-60">Global Projects</p>
                     </div>
-                </div>
-                <div data-aos="fade-up" data-aos-delay="200" class="area-peruri bento-item group cursor-pointer shadow-sm">
-                    <img src="assets/img/thb_edujak.png" class="bento-img" alt="Edujak">
-                    <div class="bento-overlay">
-                        <span class="bento-title">Edujak</span>
-                        <span class="bento-category">Competition</span>
-                    </div>
-                </div>
-                <div data-aos="fade-up" data-aos-delay="300" class="area-burgreens bento-item group cursor-pointer shadow-sm">
-                    <img src="assets/img/thb_utt.png" class="bento-img" alt="UTT">
-                    <div class="bento-overlay">
-                        <span class="bento-title">Uncovering The Truth</span>
-                        <span class="bento-category">Game Development</span>
-                    </div>
-                </div>
-                <div data-aos="fade-up" data-aos-delay="400" class="area-visious bento-item group cursor-pointer shadow-sm">
-                    <img src="assets/img/thb_wakwek.png" class="bento-img" alt="Wakwek">
-                    <div class="bento-overlay">
-                        <span class="bento-title">Wak Kwek</span>
-                        <span class="bento-category">Game Development</span>
-                    </div>
-                </div>
-                <div data-aos="fade-up" data-aos-delay="500" class="area-digital bento-item group cursor-pointer shadow-sm">
-                    <img src="assets/img/thb_jtn.png" class="bento-img" alt="Journey">
-                    <div class="bento-overlay">
-                        <span class="bento-title">Journey To NanaLand</span>
-                        <span class="bento-category">Competition</span>
+                    <div class="bg-brandTeal p-12 rounded-[3rem] text-white flex flex-col justify-center items-center text-center bento-card">
+                        <p class="font-heading text-6xl font-black italic mb-2">60</p>
+                        <p class="text-[10px] uppercase font-bold tracking-[0.3em] opacity-80">FPS Standard</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-24 overflow-hidden" style="background-color: #F9A21F;">
-        <div class="px-8 md:px-24 lg:px-64">
-            <div class="mb-16 flex flex-col items-center text-center" data-aos="fade-up">
-                <h2 class="text-xs font-bold tracking-[0.5em] text-white/80 uppercase mb-3">What They Say</h2>
-                <h3 class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">Client Stories</h3>
-                <div class="h-1.5 w-24 bg-white mt-6"></div>
+    <section id="games" class="relative py-32 bg-white overflow-hidden" x-data="{ mouseX: 0, mouseY: 0 }" @mousemove="mouseX = $event.clientX; mouseY = $event.clientY">
+
+        <div class="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none"
+            style="background-image: radial-gradient(#333A73 1.5px, transparent 1.5px); background-size: 60px 60px;"></div>
+
+        <div class="max-w-[1600px] mx-auto px-6 relative z-10">
+
+            <div class="flex justify-between items-end mb-24">
+                <div class="relative">
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="w-12 h-[2px] bg-brandTeal"></span>
+                        <span class="text-brandCoral font-black uppercase tracking-[0.4em] text-[10px]">Project Data</span>
+                    </div>
+                    <h2 class="font-heading text-7xl font-[1000] italic uppercase tracking-tighter text-[#333A73]">
+                        Selected <span class="text-brandTeal outline-text">Files.</span>
+                    </h2>
+                </div>
+                <div class="hidden lg:block text-right font-mono text-[10px] text-[#333A73]/40 tracking-widest uppercase">
+                    System_Status: Operational<br>
+                    Database_Index: 2025.01
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div data-aos="fade-up" data-aos-delay="100" class="bg-white p-10 flex flex-col justify-between h-full shadow-xl">
-                    <div>
-                        <span class="text-6xl font-serif text-[#F9A21F] leading-none">“</span>
-                        <p class="text-gray-800 text-lg leading-relaxed font-medium mt-4">Dang Creative Media berhasil mengubah visi kaku perusahaan kami menjadi pengalaman gamifikasi yang sangat interaktif.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
+                <?php
+                if ($q_games):
+                    $i = 0;
+                    // Hanya ambil 3 data teratas agar presisi secara kolom
+                    while ($g = mysqli_fetch_assoc($q_games)):
+                        $i++;
+                        if ($i > 3) break;
+
+                        // Variasi margin atas untuk efek staggered (tangga)
+                        $mt = ($i == 1) ? 'mt-0' : (($i == 2) ? 'mt-20' : 'mt-10');
+
+                        $videoId = "";
+                        if (!empty($g['trailer_url'])) {
+                            preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $g['trailer_url'], $match);
+                            $videoId = $match[1] ?? "";
+                        }
+                ?>
+                        <div class="relative <?= $mt ?> transition-transform duration-700 ease-out"
+                            :style="`transform: translateY(${(mouseY - window.innerHeight/2) * <?= 0.03 * $i ?>}px)`">
+
+                            <div class="group relative" x-data="{ isHovered: false }" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+
+                                <div class="absolute -top-6 left-6 z-20 bg-[#333A73] text-white px-4 py-1 text-[10px] font-black italic tracking-widest">
+                                    REF/00<?= $i ?>
+                                </div>
+
+                                <div class="relative aspect-[16/10] bg-[#333A73] overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700 border border-slate-100 shadow-[0_30px_60px_-15px_rgba(51,58,115,0.1)] group-hover:shadow-[0_40px_80px_-20px_rgba(89,213,224,0.4)]">
+
+                                    <img src="../uploads/game/<?= $g['header_image'] ?>"
+                                        class="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110">
+
+                                    <?php if ($videoId): ?>
+                                        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                                            <template x-if="isHovered">
+                                                <iframe src="https://www.youtube.com/embed/<?= $videoId ?>?autoplay=1&mute=1&controls=0&loop=1&playlist=<?= $videoId ?>"
+                                                    class="w-full h-full scale-[1.7] pointer-events-none" frameborder="0"></iframe>
+                                            </template>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="absolute inset-x-0 bottom-0 p-8 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-[#333A73] to-transparent">
+                                        <a href="work-detail?slug=<?= $g['slug'] ?? '#' ?>" class="inline-flex items-center gap-4 text-white group/link">
+                                            <span class="font-black uppercase italic tracking-widest text-sm">Analyze Project</span>
+                                            <svg class="w-5 h-5 group-hover/link:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-brandCoral font-black text-[9px] uppercase tracking-[0.3em]"><?= $g['category'] ?></span>
+                                        <div class="h-[1px] w-12 bg-slate-200"></div>
+                                    </div>
+                                    <h3 class="font-heading text-3xl font-black text-[#333A73] uppercase italic leading-none group-hover:text-brandTeal transition-colors">
+                                        <?= $g['title'] ?>
+                                    </h3>
+                                    <p class="text-[#333A73]/50 text-[11px] leading-relaxed font-medium uppercase tracking-tight">
+                                        <?= substr($g['short_desc'], 0, 80) ?>...
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                <?php endwhile;
+                endif; ?>
+            </div>
+
+            <div class="mt-32 pt-16 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center">
+    <div class="flex items-center gap-3 group cursor-help">
+        <div class="flex -space-x-2">
+            <div class="w-10 h-10 rounded-full bg-[#333A73] border-2 border-white group-hover:scale-110 transition-transform"></div>
+            <div class="w-10 h-10 rounded-full bg-brandTeal border-2 border-white group-hover:scale-110 transition-transform delay-75"></div>
+            <div class="w-10 h-10 rounded-full bg-brandCoral border-2 border-white group-hover:scale-110 transition-transform delay-150"></div>
+        </div>
+        <div class="overflow-hidden">
+            <span class="block text-[9px] font-black uppercase tracking-[0.3em] translate-y-full group-hover:translate-y-0 transition-transform duration-500">Color.Palette.V1</span>
+        </div>
+    </div>
+
+    <a href="portfolio.php" class="relative p-1">
+        <div class="absolute inset-0 border-2 border-[#333A73]/10 rounded-full group-hover:scale-110 group-hover:border-brandTeal/50 transition-all duration-700"></div>
+        
+        <div class="relative bg-[#333A73] hover:bg-brandTeal text-white w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center transition-all duration-500 rotate-[-15deg] hover:rotate-0 shadow-2xl">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        
+        <div class="absolute -top-4 -right-4 bg-brandGold text-[#333A73] text-[8px] font-black px-2 py-1 rotate-12">
+            ALL DATA
+        </div>
+    </a>
+</div>
+        </div>
+    </section>
+
+    <style>
+        .outline-text {
+            color: transparent;
+            -webkit-text-stroke: 1.5px #333A73;
+        }
+    </style>
+
+    <section id="articles" class="py-32 px-6 bg-brandDark text-white rounded-[3rem] md:rounded-[6xl] mx-4 relative overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-brandTeal/10 rounded-full blur-[120px]"></div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-20 gap-8">
+                <div class="space-y-4 text-center md:text-left">
+                    <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">
+                        <span class="w-1.5 h-1.5 bg-brandCoral rounded-full animate-pulse"></span>
+                        <span class="text-[9px] font-black uppercase tracking-[0.3em] text-white/70">Studio Journal</span>
                     </div>
-                    <div class="mt-10 pt-6 border-t border-gray-100">
-                        <h4 class="font-bold text-black uppercase tracking-widest text-sm">Budi Santoso</h4>
-                        <p class="text-gray-400 text-xs mt-1 uppercase">Marketing Director — Gojek</p>
-                    </div>
+                    <h2 class="font-heading text-5xl md:text-7xl font-extrabold uppercase italic leading-none tracking-tighter">
+                        Latest <span class="text-brandCoral">Insight.</span>
+                    </h2>
                 </div>
-                <div data-aos="fade-up" data-aos-delay="100" class="bg-white p-10 flex flex-col justify-between h-full shadow-xl">
-                    <div>
-                        <span class="text-6xl font-serif text-[#F9A21F] leading-none">“</span>
-                        <p class="text-gray-800 text-lg leading-relaxed font-medium mt-4">Dang Creative Media berhasil mengubah visi kaku perusahaan kami menjadi pengalaman gamifikasi yang sangat interaktif.</p>
+
+                <a href="articles.php" class="group relative inline-flex items-center gap-4 bg-white px-8 py-4 rounded-full overflow-hidden transition-all duration-300 hover:pr-12">
+                    <span class="relative z-10 text-brandDark text-[10px] font-black uppercase tracking-widest transition-colors group-hover:text-white">View All Stories</span>
+                    <div class="absolute inset-0 bg-brandCoral translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <svg class="relative z-10 w-4 h-4 text-brandDark transition-colors group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+                <?php
+                if ($q_articles && mysqli_num_rows($q_articles) > 0):
+                    while ($art = mysqli_fetch_assoc($q_articles)):
+                ?>
+                        <a href="article-detail.php?slug=<?= $art['slug'] ?>" class="group block">
+                            <div class="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden border border-white/5 mb-8 shadow-2xl shadow-black/20 bg-white/5">
+                                <img src="../uploads/articles/<?= $art['cover_image'] ?>"
+                                    class="w-full h-full object-cover transition-all duration-1000 scale-110 group-hover:scale-100 brightness-75 group-hover:brightness-100"
+                                    alt="<?= htmlspecialchars($art['title']) ?>">
+
+                                <div class="absolute inset-0 bg-gradient-to-t from-brandDark via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-500"></div>
+
+                                <div class="absolute top-6 left-6">
+                                    <span class="bg-white/10 backdrop-blur-md border border-white/20 text-[8px] font-black uppercase tracking-widest px-4 py-2 rounded-full">
+                                        <?= date('M d, Y', strtotime($art['created_at'])) ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 px-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="h-[1px] w-8 bg-brandCoral"></span>
+                                    <p class="text-[10px] font-black text-brandGold uppercase tracking-[0.2em]">
+                                        <?= htmlspecialchars($art['category'] ?? 'General') ?>
+                                    </p>
+                                </div>
+
+                                <h4 class="text-2xl md:text-3xl font-bold leading-[1.1] tracking-tight group-hover:text-brandTeal transition-colors duration-300">
+                                    <?= htmlspecialchars($art['title']) ?>
+                                </h4>
+
+                                <p class="text-white/40 text-sm line-clamp-2 font-medium leading-relaxed group-hover:text-white/60 transition-colors">
+                                    <?= strip_tags($art['content']) ?>
+                                </p>
+
+                                <div class="pt-4 flex items-center gap-2 text-brandTeal opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500">
+                                    <span class="text-[9px] font-black uppercase tracking-widest">Read Article</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </a>
+                    <?php
+                    endwhile;
+                else:
+                    ?>
+                    <div class="col-span-full py-24 text-center border-2 border-dashed border-white/5 rounded-[3rem]">
+                        <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-8 h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" stroke-width="2" />
+                            </svg>
+                        </div>
+                        <p class="text-white/20 italic tracking-widest uppercase text-xs font-black">No insights published yet.</p>
                     </div>
-                    <div class="mt-10 pt-6 border-t border-gray-100">
-                        <h4 class="font-bold text-black uppercase tracking-widest text-sm">Budi Santoso</h4>
-                        <p class="text-gray-400 text-xs mt-1 uppercase">Marketing Director — Gojek</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-24 md:py-40 px-4 md:px-6 relative overflow-hidden">
+        <div class="absolute inset-0 hidden md:flex items-center justify-center opacity-[0.03] select-none pointer-events-none">
+            <h2 class="font-heading text-[20vw] font-black uppercase tracking-tighter italic leading-none">
+                Connect
+            </h2>
+        </div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
+
+                <div class="space-y-6 md:space-y-10 text-center lg:text-left">
+                    <div class="inline-flex flex-col sm:flex-row items-center gap-4">
+                        <div class="flex -space-x-3">
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white bg-brandCoral"></div>
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white bg-brandTeal"></div>
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white bg-brandGold"></div>
+                        </div>
+                        <p class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-brandDark/40 italic">Ready to Level Up?</p>
                     </div>
+
+                    <h2 class="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-brandDark uppercase italic leading-[0.9]">
+                        Got a <br class="hidden sm:block"> <span class="text-brandTeal">Vision?</span> <br> <span class="text-outline">Share it.</span>
+                    </h2>
+
+                    <p class="text-slate-500 font-medium text-base md:text-lg max-w-md mx-auto lg:mx-0">
+                        Jangan biarkan ide hebat mengendap. Diskusikan proyek animasi atau game Anda bersama tim kreatif kami.
+                    </p>
                 </div>
-                <div data-aos="fade-up" data-aos-delay="100" class="bg-white p-10 flex flex-col justify-between h-full shadow-xl">
-                    <div>
-                        <span class="text-6xl font-serif text-[#F9A21F] leading-none">“</span>
-                        <p class="text-gray-800 text-lg leading-relaxed font-medium mt-4">Dang Creative Media berhasil mengubah visi kaku perusahaan kami menjadi pengalaman gamifikasi yang sangat interaktif.</p>
-                    </div>
-                    <div class="mt-10 pt-6 border-t border-gray-100">
-                        <h4 class="font-bold text-black uppercase tracking-widest text-sm">Budi Santoso</h4>
-                        <p class="text-gray-400 text-xs mt-1 uppercase">Marketing Director — Gojek</p>
-                    </div>
+
+                <div class="grid gap-4 md:gap-6">
+                    <a href="mailto:hello@dangdang.com"
+                        class="group relative bg-white border border-slate-100 p-0.5 md:p-1 bg-gradient-to-r hover:from-brandCoral hover:to-brandGold transition-all duration-500 rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-brandDark/5">
+                        <div class="bg-white rounded-[1.9rem] md:rounded-[2.9rem] p-6 md:p-10 flex items-center justify-between">
+                            <div class="flex items-center gap-4 md:gap-6">
+                                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-brandCoral/10 text-brandCoral flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5 md:mb-1">Send an Email</h4>
+                                    <p class="text-lg md:text-2xl font-black text-brandDark break-all">hello@dangdang.com</p>
+                                </div>
+                            </div>
+                            <div class="hidden sm:flex w-10 h-10 md:w-12 md:h-12 rounded-full border border-slate-100 items-center justify-center group-hover:bg-brandDark group-hover:text-white transition-all">
+                                <svg class="w-4 h-4 md:w-5 md:h-5 -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="#"
+                        class="group relative bg-white border border-slate-100 p-0.5 md:p-1 bg-gradient-to-r hover:from-brandTeal hover:to-brandDark transition-all duration-500 rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-brandDark/5">
+                        <div class="bg-white rounded-[1.9rem] md:rounded-[2.9rem] p-6 md:p-10 flex items-center justify-between">
+                            <div class="flex items-center gap-4 md:gap-6">
+                                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-brandTeal/10 text-brandTeal flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                                    <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5 md:mb-1">Direct Message</h4>
+                                    <p class="text-lg md:text-2xl font-black text-brandDark">@dangdangstudio</p>
+                                </div>
+                            </div>
+                            <div class="hidden sm:flex w-10 h-10 md:w-12 md:h-12 rounded-full border border-slate-100 items-center justify-center group-hover:bg-brandDark group-hover:text-white transition-all">
+                                <svg class="w-4 h-4 md:w-5 md:h-5 -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-32 px-8 md:px-24 lg:px-64 bg-white border-t border-gray-50">
-        <div class="flex justify-between items-end mb-16" data-aos="fade-up">
-            <h3 class="text-5xl font-bold tracking-tighter uppercase">Newsroom</h3>
-            <a href="#" class="font-bold text-xs tracking-widest border-b-2 border-black pb-2 hover:opacity-50 transition">VIEW ALL</a>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
-            <article data-aos="fade-up" class="group cursor-pointer">
-                <div class="h-80 bg-gray-100 mb-8 rounded-none flex items-center justify-center overflow-hidden">
-                    <img src="assets/img/thb_jtn.png" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105" alt="JTN">
-                </div>
-                <h4 class="text-2xl font-bold leading-tight group-hover:text-blue-600 transition-colors">Menjelajahi Mekanik Gameplay Baru di Update Winter 2025.</h4>
-            </article>
-            <article data-aos="fade-up" data-aos-delay="200" class="group cursor-pointer">
-                <div class="h-80 bg-gray-100 mb-8 rounded-none flex items-center justify-center overflow-hidden">
-                    <img src="assets/img/thb_us.png" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105" alt="US">
-                </div>
-                <h4 class="text-2xl font-bold leading-tight group-hover:text-blue-600 transition-colors">Bagaimana Tim Seni Kami Membangun Kota Masa Depan.</h4>
-            </article>
-        </div>
-    </section>
+    <?php include_once '_footer.php'; ?>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 1000,
-            once: true
-        });
-        const cursor = document.getElementById('cursor');
-        document.addEventListener('mousemove', e => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
-        document.querySelectorAll('.group, a, img').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.style.transform = 'translate(-50%, -50%) scale(2)');
-            el.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%, -50%) scale(1)');
-        });
-    </script>
 </body>
 
 </html>

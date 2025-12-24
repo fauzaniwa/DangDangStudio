@@ -19,6 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = mysqli_real_escape_string($conn, $_POST['status']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+    
+    // PENAMBAHAN: Ambil data Instagram
+    $instagram = mysqli_real_escape_string($conn, $_POST['instagram']);
 
     // 1. Ambil data lama untuk perbandingan log & hapus foto
     $query_old = "SELECT * FROM team WHERE id = '$id'";
@@ -38,6 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($old_data['status'] !== $status) $changes[] = "Status (" . $old_data['status'] . " → " . $status . ")";
     if ($old_data['email'] !== $email) $changes[] = "Email (" . $old_data['email'] . " → " . $email . ")";
     if ($old_data['phone'] !== $phone) $changes[] = "WhatsApp (" . $old_data['phone'] . " → " . $phone . ")";
+    
+    // PENAMBAHAN: Deteksi perubahan Instagram untuk log
+    if (($old_data['instagram'] ?? '') !== $instagram) {
+        $changes[] = "Instagram (" . ($old_data['instagram'] ?? 'Kosong') . " → " . ($instagram ?: 'Dihapus') . ")";
+    }
 
     $image_name = $old_data['member_image']; 
 
@@ -52,7 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (in_array(strtolower($file_extension), $allowed_types)) {
             if (move_uploaded_file($_FILES['member_image']['tmp_name'], $target_file)) {
                 if (!empty($old_data['member_image']) && file_exists($target_dir . $old_data['member_image'])) {
-                    unlink($target_dir . $old_data['member_image']);
+                    // Jangan hapus jika itu default_avatar.jpg
+                    if ($old_data['member_image'] !== 'default_avatar.jpg') {
+                        unlink($target_dir . $old_data['member_image']);
+                    }
                 }
                 $image_name = $new_file_name;
                 $changes[] = "Foto Profil diupdate";
@@ -60,18 +71,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // 4. Update Database
+    // 4. Update Database (Termasuk kolom instagram)
     $update_query = "UPDATE team SET 
-            name = '$name', division = '$division', level = '$level', 
-            status = '$status', email = '$email', phone = '$phone', 
-            member_image = '$image_name' WHERE id = '$id'";
+            name = '$name', 
+            division = '$division', 
+            level = '$level', 
+            status = '$status', 
+            email = '$email', 
+            phone = '$phone', 
+            instagram = '$instagram', 
+            member_image = '$image_name' 
+            WHERE id = '$id'";
 
     if (mysqli_query($conn, $update_query)) {
         
         // 5. MEKANISME ADMIN LOGS (Success)
-        // Jika tidak ada perubahan sama sekali, tulis "No data changed"
-        $detail_changes = !empty($changes) ? implode(", ", $changes) : "No specific field changed (Re-saved)";
-        $activity = "Updated staff: " . $old_data['name'] . ". Changes: " . $detail_changes;
+        $detail_changes = !empty($changes) ? implode(", ", $changes) : "No data changed";
+        $activity = "Updated staff: " . $old_data['name'] . ". Detail: " . $detail_changes;
         $type = "success"; 
 
         $log_query = "INSERT INTO admin_logs (admin_id, activity, type, ip_address, created_at) 

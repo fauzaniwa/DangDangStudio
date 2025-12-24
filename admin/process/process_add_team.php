@@ -14,7 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
     
-    // 2. Tangani Upload Foto (Potrait)
+    // PENAMBAHAN: Bersihkan input Instagram
+    $instagram = mysqli_real_escape_string($conn, $_POST['instagram']);
+    
+    // 2. Tangani Upload Foto (Portrait)
     $image_name = "default_avatar.jpg"; // Default jika tidak upload
     $upload_path = "../../uploads/team/";
 
@@ -25,16 +28,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($_FILES['member_image']['name'])) {
         $file_extension = pathinfo($_FILES['member_image']['name'], PATHINFO_EXTENSION);
-        $image_name = time() . '_member_' . preg_replace("/[^a-zA-Z0-9]/", "", $name) . '.' . $file_extension;
+        // Nama file unik berdasarkan waktu dan nama member
+        $clean_name = preg_replace("/[^a-zA-Z0-9]/", "", $name);
+        $image_name = time() . '_member_' . $clean_name . '.' . $file_extension;
         
         if (!move_uploaded_file($_FILES['member_image']['tmp_name'], $upload_path . $image_name)) {
             $image_name = "default_avatar.jpg"; // Fallback jika gagal upload
         }
     }
 
-    // 3. Query Insert ke Tabel Team
-    $query = "INSERT INTO team (name, member_image, division, level, status, email, phone, created_at) 
-              VALUES ('$name', '$image_name', '$division', '$level', '$status', '$email', '$phone', NOW())";
+    // 3. Query Insert ke Tabel Team (Ditambahkan kolom instagram)
+    $query = "INSERT INTO team (
+                name, 
+                member_image, 
+                division, 
+                level, 
+                status, 
+                email, 
+                phone, 
+                instagram, 
+                created_at
+              ) VALUES (
+                '$name', 
+                '$image_name', 
+                '$division', 
+                '$level', 
+                '$status', 
+                '$email', 
+                '$phone', 
+                '$instagram', 
+                NOW()
+              )";
 
     if (mysqli_query($conn, $query)) {
         $new_member_id = mysqli_insert_id($conn);
@@ -48,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_query($conn, $log_query);
 
         // Redirect ke halaman team dengan pesan sukses
-        header("Location: ../team.php?status=success");
+        header("Location: ../team?status=success");
         exit();
     } else {
         // Jika Gagal

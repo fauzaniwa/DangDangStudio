@@ -18,7 +18,7 @@ $data = mysqli_fetch_assoc($res_data);
 if ($data) {
     // Hapus file fisik jika ada
     if (!empty($data['attachment'])) {
-        $path = "../../uploads/finance/" . $data['attachment'];
+        $path = "../uploads/finance/" . $data['attachment'];
         if (file_exists($path)) { unlink($path); }
     }
 
@@ -32,7 +32,7 @@ if ($data) {
         $ip_address = $_SERVER['REMOTE_ADDR'];
 
         $log_sql = "INSERT INTO admin_logs (admin_id, activity, type, ip_address) 
-                    VALUES ('$admin_id', '$log_activity', 'success', '$ip_address')";
+                    VALUES ('$admin_id', '$log_activity', 'danger', '$ip_address')";
         mysqli_query($conn, $log_sql);
 
         header("Location: ../financial_report.php?status=deleted");

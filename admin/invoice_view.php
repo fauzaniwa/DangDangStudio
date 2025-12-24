@@ -1,20 +1,34 @@
 <?php
 require_once 'process/config.php';
-$id = $_GET['id'];
 
-// Ambil data invoice & client
+if (!isset($_GET['id'])) {
+    header("Location: invoice_maker.php");
+    exit();
+}
+
+$id = mysqli_real_escape_string($conn, $_GET['id']);
+
+// Ambil data invoice & client (Termasuk tax_percentage dan status)
 $query = "SELECT i.*, c.* FROM invoices i JOIN clients c ON i.client_id = c.id WHERE i.id = '$id'";
-$inv = mysqli_fetch_assoc(mysqli_query($conn, $query));
+$res = mysqli_query($conn, $query);
+$inv = mysqli_fetch_assoc($res);
+
+if (!$inv) {
+    die("Invoice tidak ditemukan.");
+}
 
 // Ambil item
 $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$id'");
+
+// Hitung Subtotal (Total - Tax)
+$subtotal = $inv['total_amount'] - $inv['tax_amount'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
-    <title>Invoice #<?php echo $inv['invoice_no']; ?></title>
+    <title>Invoice #<?php echo str_pad($inv['invoice_no'], 3, '0', STR_PAD_LEFT); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -33,15 +47,35 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
                 margin: 20px auto;
                 background: white;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                position: relative; /* Penting untuk posisi stempel */
             }
+        }
+
+        /* Stempel Lunas */
+        .paid-stamp {
+            position: absolute;
+            top: 120px;
+            right: 60px;
+            border: 8px double #10B981;
+            color: #10B981;
+            font-size: 50px;
+            font-weight: 900;
+            padding: 10px 40px;
+            text-transform: uppercase;
+            transform: rotate(-15deg);
+            opacity: 0.3;
+            border-radius: 16px;
+            user-select: none;
+            z-index: 10;
+            letter-spacing: 6px;
+            pointer-events: none;
         }
 
         /* Pengaturan Khusus Printer (Mode Cetak) */
         @media print {
             @page {
                 size: A4;
-                /* Margin fisik kertas diatur di sini untuk semua halaman */
-                margin: 20mm;
+                margin: 15mm;
             }
 
             body {
@@ -59,32 +93,23 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
                 margin: 0 !important;
                 width: 100% !important;
                 padding: 0 !important;
-                /* Padding 0 karena margin sudah diatur di @page */
                 display: block !important;
+                position: relative;
             }
 
-            /* Menghindari pemotongan baris tabel di tengah-tengah */
+            .paid-stamp {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
             tr {
                 page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            thead {
-                display: table-header-group;
-                /* Opsional: Header tabel muncul lagi di hal 2 */
             }
         }
 
-        .text-brand-teal {
-            color: #14B8A6;
-        }
-
-        .bg-brand-teal {
-            background-color: #14B8A6;
-        }
+        .text-brand-teal { color: #14B8A6; }
+        .bg-brand-teal { background-color: #14B8A6; }
     </style>
-
-
 </head>
 
 <body class="bg-slate-50">
@@ -100,6 +125,11 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
                 <span class="font-bold text-slate-200 uppercase tracking-wider text-sm">
                     Invoice #<?php echo str_pad($inv['invoice_no'], 3, '0', STR_PAD_LEFT); ?>
                 </span>
+                <?php if ($inv['status'] == 'paid'): ?>
+                    <span class="bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Paid</span>
+                <?php else: ?>
+                    <span class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Unpaid</span>
+                <?php endif; ?>
             </div>
 
             <div class="flex items-center gap-3">
@@ -117,13 +147,18 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
     </div>
 
     <div class="page-a4 print-area">
+        
+        <?php if ($inv['status'] == 'paid'): ?>
+            <div class="paid-stamp">LUNAS</div>
+        <?php endif; ?>
+
         <div class="content-wrapper">
             <div class="flex justify-between items-center mb-10">
                 <h1 class="text-6xl font-extrabold text-brand-teal tracking-tighter">Invoice</h1>
                 <div class="flex flex-col items-end">
                     <?php
-                    $logo_path = '../assets/img/logo-dangdang.png';
-                    if (file_exists($logo_path)): ?>
+                    $logo_path = '../public/assets/img/logo-dangdang.png';
+                    if (file_exists(filename: $logo_path)): ?>
                         <img src="<?php echo $logo_path; ?>" alt="Logo" class="h-16 object-contain mb-2">
                     <?php else: ?>
                         <div class="h-16 flex items-center">
@@ -142,7 +177,7 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
                 </div>
                 <div class="text-right">
                     <p class="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Invoice Date</p>
-                    <h2 class="text-2xl font-bold text-slate-800"><?php echo date('Y-m-d', strtotime($inv['invoice_date'])); ?></h2>
+                    <h2 class="text-2xl font-bold text-slate-800"><?php echo date('d F Y', strtotime($inv['invoice_date'])); ?></h2>
                 </div>
             </div>
 
@@ -183,16 +218,30 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
             </table>
 
             <div class="flex justify-end mb-16">
-                <div class="flex gap-10 items-center">
-                    <span class="text-2xl font-extrabold text-slate-800">Total</span>
-                    <span class="text-2xl font-extrabold text-slate-900">Rp <?php echo number_format($inv['total_amount'], 0, ',', '.'); ?></span>
+                <div class="w-1/2 space-y-3">
+                    <div class="flex justify-between items-center text-slate-500">
+                        <span class="text-sm font-semibold italic">Subtotal</span>
+                        <span class="text-sm font-bold">Rp <?php echo number_format($subtotal, 0, ',', '.'); ?></span>
+                    </div>
+
+                    <?php if ($inv['tax_amount'] > 0): ?>
+                    <div class="flex justify-between items-center text-slate-500 pb-3 border-b border-dashed border-gray-200">
+                        <span class="text-sm font-semibold italic">Tax (<?php echo $inv['tax_percentage']; ?>%)</span>
+                        <span class="text-sm font-bold">Rp <?php echo number_format($inv['tax_amount'], 0, ',', '.'); ?></span>
+                    </div>
+                    <?php endif; ?>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-2xl font-extrabold text-slate-800">Total</span>
+                        <span class="text-3xl font-black text-brand-teal italic">Rp <?php echo number_format($inv['total_amount'], 0, ',', '.'); ?></span>
+                    </div>
                 </div>
             </div>
 
             <div class="mb-10">
-                <h3 class="text-brand-teal font-extrabold text-sm uppercase tracking-wider mb-3">Term and Conditions</h3>
+                <h3 class="text-brand-teal font-extrabold text-sm uppercase tracking-wider mb-3">Terms and Conditions</h3>
                 <p class="text-[11px] text-slate-400 leading-relaxed max-w-2xl">
-                    We want to ensure that you fully understand how our services operate. Please take a moment to carefully read our terms and conditions.
+                    <?php echo !empty($inv['notes']) ? nl2br(htmlspecialchars($inv['notes'])) : "We want to ensure that you fully understand how our services operate. Please take a moment to carefully read our terms and conditions."; ?>
                 </p>
             </div>
         </div>
@@ -207,7 +256,7 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
                 <div>
                     <p class="font-extrabold text-slate-800 text-sm mb-1">DangDang Studio</p>
                     <p>Jalan Gegerkalong Tengah No. 16 B Gegerkalong, Sukasari</p>
-                    <p>40152</p>
+                    <p>Bandung, 40152</p>
                 </div>
                 <div class="text-right">
                     <p>studiodangdang.com</p>
@@ -216,7 +265,5 @@ $items = mysqli_query($conn, "SELECT * FROM invoice_items WHERE invoice_id = '$i
             </div>
         </div>
     </div>
-
 </body>
-
 </html>

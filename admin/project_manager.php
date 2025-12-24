@@ -108,7 +108,7 @@ $result = mysqli_query($conn, $query);
                         <?php if (mysqli_num_rows($result) > 0): ?>
                             <?php while ($pj = mysqli_fetch_assoc($result)):
                                 $colorClass = ($pj['progress'] == 100) ? 'bg-emerald-500' : 'bg-brandGold';
-                                $iconPath = "uploads/projects/" . ($pj['project_icon'] ?: 'default_icon.png');
+                                $iconPath = "../uploads/projects/" . ($pj['project_icon'] ?: 'default_icon.png');
                             ?>
                                 <div class="bg-white rounded-[32px] p-6 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group <?php echo $view_mode ? 'opacity-80' : ''; ?>">
                                     <div class="flex gap-6">

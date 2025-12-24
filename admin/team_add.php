@@ -114,11 +114,19 @@ $div_query = mysqli_query($conn, "SELECT * FROM divisions ORDER BY division_name
                                             <input type="email" name="email" placeholder="nama@dangdang.com" class="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none text-sm font-medium">
                                         </div>
 
-                                        <div class="md:col-span-2">
-                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Nomor WhatsApp (Aktif)</label>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Nomor WhatsApp</label>
                                             <div class="relative">
                                                 <span class="absolute left-6 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">+62</span>
-                                                <input type="tel" name="phone" placeholder="81234567..." class="w-full pl-16 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none text-sm font-medium">
+                                                <input type="tel" name="phone" placeholder="812345..." class="w-full pl-16 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none text-sm font-medium">
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Username Instagram</label>
+                                            <div class="relative">
+                                                <span class="absolute left-6 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">@</span>
+                                                <input type="text" name="instagram" placeholder="username" class="w-full pl-12 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none text-sm font-medium focus:bg-white focus:border-brandGold transition">
                                             </div>
                                         </div>
                                     </div>
@@ -187,7 +195,6 @@ $div_query = mysqli_query($conn, "SELECT * FROM divisions ORDER BY division_name
             const name = nameInput.value.trim();
             if (!name) return alert('Nama divisi tidak boleh kosong!');
 
-            // AJAX Request
             const formData = new URLSearchParams();
             formData.append('division_name', name);
 

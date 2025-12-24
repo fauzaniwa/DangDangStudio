@@ -145,11 +145,19 @@ $div_query = mysqli_query($conn, "SELECT * FROM divisions ORDER BY division_name
                                             <input type="email" name="email" value="<?php echo htmlspecialchars($member['email']); ?>" placeholder="nama@dangdang.com" class="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none text-sm font-medium">
                                         </div>
 
-                                        <div class="md:col-span-2">
-                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Nomor WhatsApp (Aktif)</label>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Nomor WhatsApp</label>
                                             <div class="relative">
                                                 <span class="absolute left-6 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">+62</span>
-                                                <input type="tel" name="phone" value="<?php echo htmlspecialchars($member['phone']); ?>" placeholder="81234567..." class="w-full pl-16 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none text-sm font-medium">
+                                                <input type="tel" name="phone" value="<?php echo htmlspecialchars($member['phone']); ?>" placeholder="812345..." class="w-full pl-16 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none text-sm font-medium">
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Username Instagram</label>
+                                            <div class="relative">
+                                                <span class="absolute left-6 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">@</span>
+                                                <input type="text" name="instagram" value="<?php echo htmlspecialchars($member['instagram'] ?? ''); ?>" placeholder="username" class="w-full pl-12 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-brandGold outline-none transition text-sm font-medium">
                                             </div>
                                         </div>
                                     </div>
@@ -175,13 +183,11 @@ $div_query = mysqli_query($conn, "SELECT * FROM divisions ORDER BY division_name
         <div class="flex min-h-full items-center justify-center p-4">
             <div class="relative bg-white w-full max-w-sm rounded-[32px] shadow-2xl p-8 animate-fade-in text-center border border-gray-100">
                 <div class="w-16 h-16 bg-brandPrimary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 text-brandPrimary">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2-2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 </div>
                 <h3 class="text-xl font-black text-brandPrimary mb-2">Tambah Divisi</h3>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">Create New Department</p>
-                
                 <input type="text" id="new_division_name" placeholder="Contoh: Technical Artist" class="w-full px-6 py-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-brandGold outline-none transition font-bold text-sm mb-6">
-                
                 <div class="flex gap-3">
                     <button type="button" onclick="closeDivModal()" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-gray-600 transition">Batal</button>
                     <button type="button" onclick="submitDivision()" class="flex-1 py-4 bg-brandPrimary text-white rounded-xl font-bold text-sm shadow-lg shadow-brandPrimary/20 hover:opacity-90 transition">Simpan</button>
@@ -207,18 +213,14 @@ $div_query = mysqli_query($conn, "SELECT * FROM divisions ORDER BY division_name
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
         function openDivModal() { document.getElementById('divModal').classList.remove('hidden'); }
         function closeDivModal() { document.getElementById('divModal').classList.add('hidden'); }
-
         function submitDivision() {
             const nameInput = document.getElementById('new_division_name');
             const name = nameInput.value.trim();
             if (!name) return alert('Nama divisi tidak boleh kosong!');
-
             const formData = new URLSearchParams();
             formData.append('division_name', name);
-
             fetch('process/process_add_division.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -233,12 +235,9 @@ $div_query = mysqli_query($conn, "SELECT * FROM divisions ORDER BY division_name
                     option.text = name;
                     option.selected = true;
                     select.add(option);
-                    
                     nameInput.value = '';
                     closeDivModal();
-                } else {
-                    alert(data.message);
-                }
+                } else { alert(data.message); }
             })
             .catch(err => alert('Terjadi kesalahan sistem.'));
         }

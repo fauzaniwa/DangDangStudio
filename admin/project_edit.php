@@ -73,7 +73,7 @@ $platforms_selected = json_decode($data['platforms'] ?? '[]', true) ?: [];
                         </div>
 
                         <form action="process/process_edit_project.php" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-20">
-                            
+
                             <input type="hidden" name="id" value="<?= $id ?>">
 
                             <div class="lg:col-span-4 space-y-6">
@@ -81,16 +81,18 @@ $platforms_selected = json_decode($data['platforms'] ?? '[]', true) ?: [];
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 ml-2">Project Identity (Icon)</label>
                                     <div class="relative aspect-square rounded-[24px] border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden group hover:border-brandGold transition-all">
                                         <input type="file" name="project_icon" id="project_icon" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-20">
-                                        
-                                        <?php $has_icon = !empty($project_icon); ?>
-                                        <img id="icon-prev" src="uploads/projects/<?= $project_icon ?>" class="absolute inset-0 w-full h-full object-cover <?= $has_icon ? '' : 'hidden' ?> z-10">
+
+                                        <?php
+                                        // Pastikan path ini benar sesuai struktur folder Anda
+                                        $icon_path = "../uploads/projects/" . $project_icon;
+                                        $has_icon = (!empty($project_icon) && file_exists($icon_path));
+                                        ?>
+
+                                        <img id="icon-prev"
+                                            src="<?= $has_icon ? $icon_path : '' ?>"
+                                            class="absolute inset-0 w-full h-full object-cover <?= $has_icon ? '' : 'hidden' ?> z-10">
 
                                         <div id="icon-placeholder" class="text-center p-4 <?= $has_icon ? 'hidden' : '' ?>">
-                                            <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:bg-brandGold/10 transition-colors">
-                                                <svg class="w-6 h-6 text-gray-400 group-hover:text-brandGold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                                </svg>
-                                            </div>
                                             <p class="text-[10px] font-bold text-gray-400 uppercase">Change Icon</p>
                                         </div>
                                     </div>
@@ -105,7 +107,7 @@ $platforms_selected = json_decode($data['platforms'] ?? '[]', true) ?: [];
                                     <div id="platform-container" class="grid grid-cols-1 gap-2">
                                         <?php
                                         $p_query = mysqli_query($conn, "SELECT * FROM game_platforms ORDER BY platform_name ASC");
-                                        while ($plt = mysqli_fetch_assoc($p_query)): 
+                                        while ($plt = mysqli_fetch_assoc($p_query)):
                                             $is_checked = in_array($plt['platform_name'], $platforms_selected) ? 'checked' : '';
                                         ?>
                                             <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-50 hover:bg-gray-50 cursor-pointer transition group">
@@ -224,44 +226,60 @@ $platforms_selected = json_decode($data['platforms'] ?? '[]', true) ?: [];
         </div>
     </div>
     <script>
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
 
         function saveOption(type) {
             let inputId, selectId;
-            if(type === 'genre') { inputId = 'new-genre-name'; selectId = 'select-genre'; }
-            else if(type === 'status') { inputId = 'new-status-name'; selectId = 'select-status'; }
-            else { inputId = 'new-platform-name'; selectId = 'platform-container'; }
+            if (type === 'genre') {
+                inputId = 'new-genre-name';
+                selectId = 'select-genre';
+            } else if (type === 'status') {
+                inputId = 'new-status-name';
+                selectId = 'select-status';
+            } else {
+                inputId = 'new-platform-name';
+                selectId = 'platform-container';
+            }
 
             const val = document.getElementById(inputId).value;
             if (!val) return alert('Nama tidak boleh kosong!');
 
             fetch('process/process_quick_add.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `type=${type}&name=${encodeURIComponent(val)}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (type === 'platform') {
-                        const container = document.getElementById('platform-container');
-                        const newLabel = document.createElement('label');
-                        newLabel.className = "flex items-center gap-3 p-3 rounded-xl border border-gray-50 hover:bg-gray-50 cursor-pointer transition group";
-                        newLabel.innerHTML = `<input type="checkbox" name="platforms[]" value="${val}" checked class="w-4 h-4 rounded border-gray-300 text-brandGold focus:ring-brandGold"><span class="text-xs font-bold text-slate-600 group-hover:text-brandPrimary">${val}</span>`;
-                        container.appendChild(newLabel);
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `type=${type}&name=${encodeURIComponent(val)}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (type === 'platform') {
+                            const container = document.getElementById('platform-container');
+                            const newLabel = document.createElement('label');
+                            newLabel.className = "flex items-center gap-3 p-3 rounded-xl border border-gray-50 hover:bg-gray-50 cursor-pointer transition group";
+                            newLabel.innerHTML = `<input type="checkbox" name="platforms[]" value="${val}" checked class="w-4 h-4 rounded border-gray-300 text-brandGold focus:ring-brandGold"><span class="text-xs font-bold text-slate-600 group-hover:text-brandPrimary">${val}</span>`;
+                            container.appendChild(newLabel);
+                        } else {
+                            const select = document.getElementById(selectId);
+                            const opt = document.createElement('option');
+                            opt.value = val;
+                            opt.innerHTML = val;
+                            opt.selected = true;
+                            select.appendChild(opt);
+                        }
+                        closeModal(`modal-${type}`);
+                        document.getElementById(inputId).value = '';
                     } else {
-                        const select = document.getElementById(selectId);
-                        const opt = document.createElement('option');
-                        opt.value = val; opt.innerHTML = val; opt.selected = true;
-                        select.appendChild(opt);
+                        alert(data.message);
                     }
-                    closeModal(`modal-${type}`);
-                    document.getElementById(inputId).value = '';
-                } else {
-                    alert(data.message);
-                }
-            });
+                });
         }
 
         document.getElementById('project_icon').addEventListener('change', function() {
@@ -284,4 +302,5 @@ $platforms_selected = json_decode($data['platforms'] ?? '[]', true) ?: [];
         }
     </script>
 </body>
+
 </html>

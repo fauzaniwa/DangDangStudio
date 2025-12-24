@@ -6,7 +6,7 @@ session_start();
 $query = "SELECT pt.*, c.company_name 
           FROM project_timelines pt 
           LEFT JOIN clients c ON pt.client_id = c.id 
-          ORDER BY pt.deadline_date ASC";
+          ORDER BY pt.deadline_date DESC";
 $result = mysqli_query($conn, $query);
 ?>
 
