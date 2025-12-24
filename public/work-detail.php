@@ -17,7 +17,22 @@ if (!$game) {
 $screenshots = !empty($game['screenshots']) ? json_decode($game['screenshots'], true) : [];
 $dist_links = !empty($game['distribution_links']) ? json_decode($game['distribution_links'], true) : [];
 
-// 3. Query Rekomendasi
+// 3. Persiapan Data SSO (Social Share Optimization)
+$page_title = $game['title'] . " | DangDang Studio";
+$page_desc = strip_tags(substr($game['short_desc'], 0, 160));
+// Gunakan URL absolut untuk Meta Tags
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+$full_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$image_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . "/uploads/game/" . $game['header_image'];
+
+// 4. Extract YouTube Video ID
+$videoId = "";
+if (!empty($game['trailer_url'])) {
+    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $game['trailer_url'], $match);
+    $videoId = $match[1] ?? "";
+}
+
+// 5. Query Rekomendasi
 $rec_result = mysqli_query($conn, "SELECT * FROM games WHERE id != '{$game['id']}' ORDER BY RAND() LIMIT 3");
 ?>
 
@@ -27,7 +42,24 @@ $rec_result = mysqli_query($conn, "SELECT * FROM games WHERE id != '{$game['id']
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $game['title'] ?> | DangDang Studio</title>
+    
+    <title><?= $page_title ?></title>
+    <meta name="description" content="<?= $page_desc ?>">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?= $full_url ?>">
+    <meta property="og:title" content="<?= $page_title ?>">
+    <meta property="og:description" content="<?= $page_desc ?>">
+    <meta property="og:image" content="<?= $image_url ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<?= $full_url ?>">
+    <meta property="twitter:title" content="<?= $page_title ?>">
+    <meta property="twitter:description" content="<?= $page_desc ?>">
+    <meta property="twitter:image" content="<?= $image_url ?>">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <style>
@@ -71,10 +103,13 @@ $rec_result = mysqli_query($conn, "SELECT * FROM games WHERE id != '{$game['id']
             box-shadow: 0 15px 30px rgba(1, 158, 154, 0.25);
         }
 
-        /* Hero Image Layout */
         .hero-full {
-            height: 70vh; /* Mengambil 70% tinggi layar */
+            height: 70vh;
             width: 100%;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -137,6 +172,18 @@ $rec_result = mysqli_query($conn, "SELECT * FROM games WHERE id != '{$game['id']
         </aside>
 
         <main class="lg:col-span-9 lg:col-start-3 order-1 lg:order-2">
+            
+            <?php if ($videoId): ?>
+            <div class="mb-20 rounded-[3rem] overflow-hidden shadow-2xl bg-black aspect-video ring-8 ring-white no-print">
+                <iframe class="w-full h-full" 
+                        src="https://www.youtube.com/embed/<?= $videoId ?>?rel=0&showinfo=0" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+            <?php endif; ?>
+
             <article class="article-content max-w-none mb-24">
                 <h2 class="flex items-center gap-4">
                     <span class="w-12 h-1 bg-[#019E9A] rounded-full inline-block"></span>
@@ -146,7 +193,7 @@ $rec_result = mysqli_query($conn, "SELECT * FROM games WHERE id != '{$game['id']
             </article>
 
             <?php if (!empty($dist_links)): ?>
-            <div class="mb-32 p-12 md:p-20 bg-[#333A73] rounded-[4rem] text-center text-white relative overflow-hidden shadow-2xl">
+            <div class="mb-32 p-12 md:p-20 bg-[#333A73] rounded-[4rem] text-center text-white relative overflow-hidden shadow-2xl no-print">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-[#019E9A]/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
                 
                 <h3 class="relative z-10 text-3xl italic uppercase font-black mb-4">Initialize Play</h3>

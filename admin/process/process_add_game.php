@@ -1,6 +1,4 @@
 <?php
-// Sesuaikan dengan posisi config.php Anda. 
-// Jika di folder yang sama (admin/process/), gunakan:
 require_once 'config.php'; 
 
 session_start();
@@ -14,6 +12,12 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
+// FUNGSI HELPER: Membuat Slug dari Judul
+function createSlug($string) {
+    $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string)));
+    return $slug;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin_id = $_SESSION['admin_id'];
 
@@ -23,6 +27,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category = mysqli_real_escape_string($conn, $_POST['category']);
     $short_desc = mysqli_real_escape_string($conn, $_POST['short_desc']);
     $long_desc = mysqli_real_escape_string($conn, $_POST['long_desc']);
+
+    // --- IMPLEMENTASI SLUG ---
+    $slug = createSlug($title);
+    
+    // Cek apakah slug sudah ada (untuk mencegah duplikasi URL)
+    $check_slug = mysqli_query($conn, "SELECT id FROM games WHERE slug = '$slug'");
+    if (mysqli_num_rows($check_slug) > 0) {
+        // Jika ada yang sama, tambahkan suffix waktu unik
+        $slug = $slug . '-' . time();
+    }
+    // -------------------------
 
     // 2. Olah Link Distribution (JSON)
     $links = [];
@@ -37,13 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $links_json = json_encode($links);
 
     // 3. Konfigurasi Upload Gambar
-    // Karena file ini ada di admin/process/, folder upload ada di ../../uploads/game/
     $upload_dir = "../../uploads/game/";
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0777, true);
     }
 
-    // Fungsi Helper Upload
     function uploadGameImage($file_array, $prefix, $upload_dir) {
         $ext = pathinfo($file_array['name'], PATHINFO_EXTENSION);
         $new_name = $prefix . "_" . time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
@@ -79,12 +92,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $screenshots_json = json_encode($screenshot_names);
 
-    // 4. Insert ke Database
-    $sql = "INSERT INTO games (title, trailer_url, category, short_desc, long_desc, header_image, game_logo, screenshots, distribution_links, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    // 4. Insert ke Database (Ditambahkan kolom 'slug')
+    $sql = "INSERT INTO games (title, slug, trailer_url, category, short_desc, long_desc, header_image, game_logo, screenshots, distribution_links, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssssss", $title, $trailer_url, $category, $short_desc, $long_desc, $header_image, $game_logo, $screenshots_json, $links_json);
+    // Bind parameter ditambahkan satu "s" untuk slug
+    $stmt->bind_param("ssssssssss", $title, $slug, $trailer_url, $category, $short_desc, $long_desc, $header_image, $game_logo, $screenshots_json, $links_json);
 
     if ($stmt->execute()) {
         // 5. Catat ke admin_logs

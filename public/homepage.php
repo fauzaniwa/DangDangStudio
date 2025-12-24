@@ -122,16 +122,16 @@ $q_partners = fetchSafe($conn, "SELECT * FROM partners ORDER BY created_at DESC"
             <div class="flex justify-between items-end mb-24">
                 <div class="relative">
                     <div class="flex items-center gap-4 mb-2">
-                        <span class="w-12 h-[2px] bg-brandTeal"></span>
-                        <span class="text-brandCoral font-black uppercase tracking-[0.4em] text-[10px]">Project Data</span>
+                        <span class="w-12 h-[2px] bg-[#019E9A]"></span>
+                        <span class="text-[#FF6136] font-black uppercase tracking-[0.4em] text-[10px]">Project Data</span>
                     </div>
-                    <h2 class="font-heading text-7xl font-[1000] italic uppercase tracking-tighter text-[#333A73]">
-                        Selected <span class="text-brandTeal outline-text">Files.</span>
+                    <h2 class="font-heading text-6xl md:text-8xl font-[1000] italic uppercase tracking-tighter text-[#333A73] leading-none">
+                        Selected <span class="text-[#019E9A] outline-text">Files.</span>
                     </h2>
                 </div>
                 <div class="hidden lg:block text-right font-mono text-[10px] text-[#333A73]/40 tracking-widest uppercase">
                     System_Status: Operational<br>
-                    Database_Index: 2025.01
+                    Database_Index: 2025.ARCHIVE
                 </div>
             </div>
 
@@ -139,12 +139,10 @@ $q_partners = fetchSafe($conn, "SELECT * FROM partners ORDER BY created_at DESC"
                 <?php
                 if ($q_games):
                     $i = 0;
-                    // Hanya ambil 3 data teratas agar presisi secara kolom
                     while ($g = mysqli_fetch_assoc($q_games)):
                         $i++;
                         if ($i > 3) break;
 
-                        // Variasi margin atas untuk efek staggered (tangga)
                         $mt = ($i == 1) ? 'mt-0' : (($i == 2) ? 'mt-20' : 'mt-10');
 
                         $videoId = "";
@@ -153,83 +151,92 @@ $q_partners = fetchSafe($conn, "SELECT * FROM partners ORDER BY created_at DESC"
                             $videoId = $match[1] ?? "";
                         }
                 ?>
-                        <div class="relative <?= $mt ?> transition-transform duration-700 ease-out"
+                        <a href="work-detail?slug=<?= $g['slug'] ?>"
+                            class="relative <?= $mt ?> block group transition-transform duration-700 ease-out"
+                            x-data="{ isHovered: false }"
+                            @mouseenter="isHovered = true"
+                            @mouseleave="isHovered = false"
                             :style="`transform: translateY(${(mouseY - window.innerHeight/2) * <?= 0.03 * $i ?>}px)`">
 
-                            <div class="group relative" x-data="{ isHovered: false }" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+                            <div class="absolute -top-4 left-8 z-30 bg-[#333A73] text-white px-4 py-1 text-[8px] font-black italic tracking-[0.3em] rounded-full shadow-lg">
+                                DATA_REF/00<?= $i ?>
+                            </div>
 
-                                <div class="absolute -top-6 left-6 z-20 bg-[#333A73] text-white px-4 py-1 text-[10px] font-black italic tracking-widest">
-                                    REF/00<?= $i ?>
-                                </div>
+                            <div class="relative aspect-[16/10] bg-slate-100 rounded-[3rem] overflow-hidden group-hover:shadow-[0_40px_80px_-20px_rgba(1,158,154,0.3)] transition-all duration-700 border border-slate-100/50">
 
-                                <div class="relative aspect-[16/10] bg-[#333A73] overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700 border border-slate-100 shadow-[0_30px_60px_-15px_rgba(51,58,115,0.1)] group-hover:shadow-[0_40px_80px_-20px_rgba(89,213,224,0.4)]">
+                                <img src="../uploads/game/<?= $g['header_image'] ?>"
+                                    class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-[1.5s] group-hover:scale-105">
 
-                                    <img src="../uploads/game/<?= $g['header_image'] ?>"
-                                        class="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110">
-
-                                    <?php if ($videoId): ?>
-                                        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                            <template x-if="isHovered">
-                                                <iframe src="https://www.youtube.com/embed/<?= $videoId ?>?autoplay=1&mute=1&controls=0&loop=1&playlist=<?= $videoId ?>"
-                                                    class="w-full h-full scale-[1.7] pointer-events-none" frameborder="0"></iframe>
-                                            </template>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <div class="absolute inset-x-0 bottom-0 p-8 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-[#333A73] to-transparent">
-                                        <a href="work-detail?slug=<?= $g['slug'] ?? '#' ?>" class="inline-flex items-center gap-4 text-white group/link">
-                                            <span class="font-black uppercase italic tracking-widest text-sm">Analyze Project</span>
-                                            <svg class="w-5 h-5 group-hover/link:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                        </a>
+                                <?php if ($videoId): ?>
+                                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                                        <template x-if="isHovered">
+                                            <iframe src="https://www.youtube.com/embed/<?= $videoId ?>?autoplay=1&mute=1&controls=0&loop=1&playlist=<?= $videoId ?>"
+                                                class="w-full h-full scale-[1.8]" frameborder="0"></iframe>
+                                        </template>
                                     </div>
-                                </div>
+                                <?php endif; ?>
 
-                                <div class="mt-8 space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-brandCoral font-black text-[9px] uppercase tracking-[0.3em]"><?= $g['category'] ?></span>
-                                        <div class="h-[1px] w-12 bg-slate-200"></div>
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                    <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
                                     </div>
-                                    <h3 class="font-heading text-3xl font-black text-[#333A73] uppercase italic leading-none group-hover:text-brandTeal transition-colors">
-                                        <?= $g['title'] ?>
-                                    </h3>
-                                    <p class="text-[#333A73]/50 text-[11px] leading-relaxed font-medium uppercase tracking-tight">
-                                        <?= substr($g['short_desc'], 0, 80) ?>...
-                                    </p>
                                 </div>
                             </div>
-                        </div>
+
+                            <div class="mt-10 px-4 relative">
+
+                                <?php if (!empty($g['game_logo'])): ?>
+                                    <div class="absolute -top-20 right-4 w-20 h-20 bg-white p-2 shadow-2xl rounded-full z-20 border-4 border-white transform group-hover:-translate-y-3 group-hover:rotate-12 transition-all duration-500">
+                                        <img src="../uploads/game/<?= $g['game_logo'] ?>" class="w-full h-full object-contain rounded-full" alt="Icon">
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="text-[#019E9A] font-black text-[9px] uppercase tracking-[0.4em]"><?= $g['category'] ?></span>
+                                    <div class="h-[1px] w-8 bg-slate-200 group-hover:w-16 transition-all duration-500"></div>
+                                </div>
+
+                                <h3 class="text-4xl font-[1000] text-[#333A73] uppercase italic leading-none tracking-tighter group-hover:text-[#FF6136] transition-colors duration-300">
+                                    <?= $g['title'] ?>
+                                </h3>
+
+                                <p class="mt-4 text-slate-400 text-[12px] leading-relaxed font-medium uppercase tracking-tight line-clamp-2 max-w-[85%]">
+                                    <?= $g['short_desc'] ?>
+                                </p>
+
+                                <div class="mt-8 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                    <span class="text-[9px] font-black text-[#333A73] tracking-widest uppercase italic">Initialize Analysis</span>
+                                    <span class="w-10 h-px bg-[#333A73]"></span>
+                                </div>
+                            </div>
+                        </a>
                 <?php endwhile;
                 endif; ?>
             </div>
 
-            <div class="mt-32 pt-16 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center">
-    <div class="flex items-center gap-3 group cursor-help">
-        <div class="flex -space-x-2">
-            <div class="w-10 h-10 rounded-full bg-[#333A73] border-2 border-white group-hover:scale-110 transition-transform"></div>
-            <div class="w-10 h-10 rounded-full bg-brandTeal border-2 border-white group-hover:scale-110 transition-transform delay-75"></div>
-            <div class="w-10 h-10 rounded-full bg-brandCoral border-2 border-white group-hover:scale-110 transition-transform delay-150"></div>
-        </div>
-        <div class="overflow-hidden">
-            <span class="block text-[9px] font-black uppercase tracking-[0.3em] translate-y-full group-hover:translate-y-0 transition-transform duration-500">Color.Palette.V1</span>
-        </div>
-    </div>
+            <div class="mt-40 pt-16 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-10">
+                <div class="flex items-center gap-6 group cursor-help">
+                    <div class="flex -space-x-4">
+                        <div class="w-14 h-14 rounded-full bg-[#333A73] border-4 border-white shadow-xl"></div>
+                        <div class="w-14 h-14 rounded-full bg-[#019E9A] border-4 border-white shadow-xl"></div>
+                    </div>
+                    <div class="font-mono">
+                        <span class="block text-[10px] font-black uppercase tracking-[0.3em] text-[#333A73]">Creative.Intelligence</span>
+                        <span class="text-[9px] text-slate-400 uppercase">DangDang Studio Archive</span>
+                    </div>
+                </div>
 
-    <a href="portfolio.php" class="relative p-1">
-        <div class="absolute inset-0 border-2 border-[#333A73]/10 rounded-full group-hover:scale-110 group-hover:border-brandTeal/50 transition-all duration-700"></div>
-        
-        <div class="relative bg-[#333A73] hover:bg-brandTeal text-white w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center transition-all duration-500 rotate-[-15deg] hover:rotate-0 shadow-2xl">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
-        
-        <div class="absolute -top-4 -right-4 bg-brandGold text-[#333A73] text-[8px] font-black px-2 py-1 rotate-12">
-            ALL DATA
-        </div>
-    </a>
-</div>
+                <a href="portfolio.php" class="group relative inline-block">
+                    <div class="absolute inset-0 border border-[#333A73]/10 rounded-full group-hover:scale-125 group-hover:border-[#019E9A]/50 transition-all duration-700 animate-spin-slow"></div>
+                    <div class="relative bg-[#333A73] group-hover:bg-[#019E9A] text-white w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl group-hover:rotate-12">
+                        <svg class="w-10 h-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -237,6 +244,20 @@ $q_partners = fetchSafe($conn, "SELECT * FROM partners ORDER BY created_at DESC"
         .outline-text {
             color: transparent;
             -webkit-text-stroke: 1.5px #333A73;
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin-slow {
+            animation: spin-slow 10s linear infinite;
         }
     </style>
 

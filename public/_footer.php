@@ -54,7 +54,7 @@
             </div>
         </div>
 
-        <div class="article-content pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
             <p class="text-[10px] font-black uppercase tracking-widest text-white/20">
                 © 2025 DangDang Studio. Dibuat dengan semangat di Indonesia.
             </p>
