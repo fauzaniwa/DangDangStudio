@@ -42,9 +42,25 @@ $res_gallery = mysqli_query($conn, $sql_gallery);
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
     <style>
-        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .group:hover .overlay-delete { opacity: 1; }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .group:hover .overlay-delete {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -68,7 +84,7 @@ $res_gallery = mysqli_query($conn, $sql_gallery);
 
                         <form action="process/process_edit_article.php" method="POST" enctype="multipart/form-data" class="space-y-8 pb-20">
                             <input type="hidden" name="id" value="<?php echo $article['id']; ?>">
-                            
+
                             <input type="hidden" name="delete_assets" id="delete_assets_input" value="">
 
                             <div class="group relative">
@@ -81,9 +97,9 @@ $res_gallery = mysqli_query($conn, $sql_gallery);
                                     </button>
 
                                     <input type="file" id="cover-input" name="article_cover" accept="image/*" onchange="previewCover(this)" class="absolute inset-0 opacity-0 cursor-pointer z-30">
-                                    
-                                    <img id="cover-prev" src="<?php echo !empty($article['cover_image']) ? '../uploads/articles/'.$article['cover_image'] : ''; ?>" 
-                                         class="absolute inset-0 w-full h-full object-cover z-10 <?php echo empty($article['cover_image']) ? 'hidden' : ''; ?>">
+
+                                    <img id="cover-prev" src="<?php echo !empty($article['cover_image']) ? '../uploads/articles/' . $article['cover_image'] : ''; ?>"
+                                        class="absolute inset-0 w-full h-full object-cover z-10 <?php echo empty($article['cover_image']) ? 'hidden' : ''; ?>">
 
                                     <div id="cover-placeholder" class="text-center z-20 <?php echo !empty($article['cover_image']) ? 'hidden' : ''; ?>">
                                         <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -110,10 +126,32 @@ $res_gallery = mysqli_query($conn, $sql_gallery);
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Category</label>
                                         <select name="category" required class="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-brandGold outline-none transition font-bold text-sm">
-                                            <?php 
-                                            $categories = ["Announcement", "Development Log", "Art Showcase", "Event"];
-                                            foreach($categories as $cat) {
-                                                $selected = ($article['category'] == $cat) ? 'selected' : '';
+                                            <?php
+                                            $categories = [
+                                                // General
+                                                "Announcement",
+                                                "News",
+                                                "Event",
+                                                "Community",
+                                                // Game Dev Specific
+                                                "Development Log",
+                                                "Patch Notes",
+                                                "Technical",
+                                                "Roadmap",
+                                                // Creative & Lore
+                                                "Art Showcase",
+                                                "Concept Art",
+                                                "Lore",
+                                                "Audio",
+                                                "Behind the Scenes",
+                                                // Resources
+                                                "Tutorial",
+                                                "Interview"
+                                            ];
+
+                                            foreach ($categories as $cat) {
+                                                // Memastikan data $article['category'] ada sebelum dicek
+                                                $selected = (isset($article['category']) && $article['category'] == $cat) ? 'selected' : '';
                                                 echo "<option value='$cat' $selected>$cat</option>";
                                             }
                                             ?>
@@ -147,25 +185,27 @@ $res_gallery = mysqli_query($conn, $sql_gallery);
                                 </div>
 
                                 <div id="image-gallery-preview" class="grid grid-cols-2 md:grid-cols-4 gap-4 min-h-[150px] p-6 bg-gray-50 rounded-[28px] border-2 border-dashed border-gray-100">
-                                    <?php while($img = mysqli_fetch_assoc($res_gallery)): ?>
+                                    <?php while ($img = mysqli_fetch_assoc($res_gallery)): ?>
                                         <div id="asset-<?php echo $img['id']; ?>" class="relative group aspect-square rounded-[20px] overflow-hidden shadow-sm border border-white animate-fade-in">
                                             <img src="../uploads/articles/gallery/<?php echo $img['image_url']; ?>" class="w-full h-full object-cover transition group-hover:scale-110">
                                             <div class="absolute inset-0 bg-brandAccent/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
                                                 <button type="button" onclick="markAssetForDeletion('<?php echo $img['id']; ?>')" class="bg-white p-2.5 rounded-xl text-brandAccent shadow-xl hover:scale-110 transition">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
                                                 </button>
                                                 <span class="text-[9px] text-white font-bold mt-2 uppercase tracking-tighter">Remove</span>
                                             </div>
                                         </div>
                                     <?php endwhile; ?>
 
-                                    <?php if(mysqli_num_rows($res_gallery) == 0): ?>
-                                    <div id="gallery-placeholder" class="col-span-full flex flex-col items-center justify-center text-gray-300 py-4">
-                                        <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                        <p class="text-[10px] font-bold uppercase tracking-tighter">No assets selected</p>
-                                    </div>
+                                    <?php if (mysqli_num_rows($res_gallery) == 0): ?>
+                                        <div id="gallery-placeholder" class="col-span-full flex flex-col items-center justify-center text-gray-300 py-4">
+                                            <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <p class="text-[10px] font-bold uppercase tracking-tighter">No assets selected</p>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -188,11 +228,12 @@ $res_gallery = mysqli_query($conn, $sql_gallery);
     <script>
         // --- LOGIKA HAPUS IMAGE GALLERY LAMA ---
         let assetsToDelete = [];
+
         function markAssetForDeletion(assetId) {
             if (confirm('Hapus aset ini secara permanen dari server?')) {
                 assetsToDelete.push(assetId);
                 document.getElementById('delete_assets_input').value = assetsToDelete.join(',');
-                
+
                 const element = document.getElementById('asset-' + assetId);
                 element.style.transform = 'scale(0)';
                 element.style.opacity = '0';
@@ -258,4 +299,5 @@ $res_gallery = mysqli_query($conn, $sql_gallery);
         }
     </script>
 </body>
+
 </html>

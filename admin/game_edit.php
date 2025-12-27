@@ -24,6 +24,7 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,10 +34,34 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .sortable-ghost { opacity: 0.3; background: #fef08a; border: 2px dashed #eab308; }
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .sortable-ghost {
+            opacity: 0.3;
+            background: #fef08a;
+            border: 2px dashed #eab308;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
 
@@ -50,9 +75,11 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
 
                 <div class="p-6 md:p-10 flex-1">
                     <div class="max-w-5xl mx-auto">
-                        
+
                         <a href="games.php" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brandGold transition mb-8">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
                             Back to Game Portfolio
                         </a>
 
@@ -95,13 +122,15 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
                                         </div>
                                     </div>
                                     <div id="screenshot-preview-container" class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                        <?php foreach($existing_screenshots as $ss): ?>
-                                            <div class="relative aspect-video rounded-2xl overflow-hidden bg-gray-100 cursor-move border-2 border-transparent hover:border-brandGold transition-all group animate-fade-in shadow-sm" 
-                                                 data-type="existing" data-filename="<?php echo $ss; ?>">
+                                        <?php foreach ($existing_screenshots as $ss): ?>
+                                            <div class="relative aspect-video rounded-2xl overflow-hidden bg-gray-100 cursor-move border-2 border-transparent hover:border-brandGold transition-all group animate-fade-in shadow-sm"
+                                                data-type="existing" data-filename="<?php echo $ss; ?>">
                                                 <img src="../uploads/game/<?php echo $ss; ?>" class="w-full h-full object-cover">
                                                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                                                     <button type="button" onclick="this.parentElement.parentElement.remove()" class="bg-red-500 text-white p-2 rounded-xl hover:scale-110 transition shadow-lg">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
                                                     </button>
                                                 </div>
                                             </div>
@@ -109,7 +138,7 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
                                 <h2 class="text-xl font-bold text-brandPrimary mb-8 flex items-center gap-3">
                                     <span class="w-2 h-8 bg-brandTeal rounded-full"></span> 2. Game Information
@@ -125,12 +154,42 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Category</label>
-                                        <select name="category" class="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none font-bold text-sm">
-                                            <?php 
-                                            $cats = ['Action', 'RPG', 'Adventure', 'Puzzle'];
-                                            foreach($cats as $c) {
-                                                $sel = ($game['category'] == $c) ? 'selected' : '';
-                                                echo "<option value='$c' $sel>$c</option>";
+                                        <select name="category" class="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none font-bold text-sm focus:border-brandTeal transition">
+                                            <?php
+                                            // Definisikan array kategori dengan label yang lebih rapi
+                                            $categories = [
+                                                "Action" => "Action",
+                                                "Gamifikasi" => "Gamifikasi",
+                                                "Action-Adventure" => "Action-Adventure",
+                                                "FPS" => "FPS (First Person Shooter)",
+                                                "TPS" => "TPS (Third Person Shooter)",
+                                                "Fighting" => "Fighting",
+                                                "Hack and Slash" => "Hack and Slash",
+                                                "RPG" => "RPG (Role-Playing Game)",
+                                                "Action RPG" => "Action RPG",
+                                                "MMORPG" => "MMORPG",
+                                                "Strategy RPG" => "Strategy RPG",
+                                                "Strategy" => "Strategy",
+                                                "RTS" => "RTS (Real-Time Strategy)",
+                                                "MOBA" => "MOBA",
+                                                "Simulation" => "Simulation",
+                                                "City Builder" => "City Builder",
+                                                "Adventure" => "Adventure",
+                                                "Puzzle" => "Puzzle",
+                                                "Casual" => "Casual",
+                                                "Platformer" => "Platformer",
+                                                "Horror" => "Horror",
+                                                "Sports" => "Sports",
+                                                "Racing" => "Racing",
+                                                "Sandbox" => "Sandbox / Open World",
+                                                "Indie" => "Indie",
+                                                "Survival" => "Survival"
+                                            ];
+
+                                            foreach ($categories as $value => $label) {
+                                                // Logika untuk menentukan kategori mana yang sedang aktif di database
+                                                $selected = ($game['category'] == $value) ? 'selected' : '';
+                                                echo "<option value=\"$value\" $selected>$label</option>";
                                             }
                                             ?>
                                         </select>
@@ -150,28 +209,49 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
                                 <h2 class="text-xl font-bold text-brandPrimary mb-8 flex items-center gap-3">
                                     <span class="w-2 h-8 bg-brandAccent rounded-full"></span> 3. Distribution Links
                                 </h2>
+
                                 <div id="link-container" class="space-y-4">
-                                    <?php foreach($existing_links as $i => $link): ?>
+                                    <?php
+                                    // Definisikan daftar platform dan icon di satu tempat agar mudah dikelola
+                                    $platforms = [
+                                        'Direct'    => '🌐',
+                                        'Steam'     => '🎮',
+                                        'PlayStore' => '🤖',
+                                        'AppStore'  => '🍎',
+                                        'ItchIo'    => '🕹️', // Contoh tambahan jika perlu
+                                        'Epic'      => '🔥'
+                                    ];
+
+                                    foreach ($existing_links as $i => $link):
+                                    ?>
                                         <div class="flex flex-col md:flex-row items-center gap-4 p-5 bg-gray-50 rounded-[24px] border border-gray-100 animate-fade-in group">
                                             <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm text-2xl border border-gray-50" id="platform-icon-<?php echo $i; ?>">
-                                                <?php 
-                                                $icons = ['Direct'=>'🌐', 'Steam'=>'🎮', 'PlayStore'=>'🤖', 'AppStore'=>'🍎'];
-                                                echo $icons[$link['platform']] ?? '🌐';
-                                                ?>
+                                                <?php echo $platforms[$link['platform']] ?? '🌐'; ?>
                                             </div>
-                                            <select name="link_platform[]" onchange="updateIcon(this, <?php echo $i; ?>)" class="w-full md:w-40 bg-transparent font-bold text-sm outline-none">
-                                                <?php foreach($icons as $p => $v): ?>
-                                                    <option value="<?php echo $p; ?>" <?php echo ($link['platform']==$p)?'selected':''; ?>><?php echo $p; ?></option>
+
+                                            <select name="link_platform[]" onchange="updateIcon(this, <?php echo $i; ?>)" class="w-full md:w-40 bg-transparent font-bold text-sm outline-none focus:text-brandTeal transition">
+                                                <?php foreach ($platforms as $p_value => $p_icon): ?>
+                                                    <option value="<?php echo $p_value; ?>" <?php echo ($link['platform'] == $p_value) ? 'selected' : ''; ?>>
+                                                        <?php echo $p_value; ?>
+                                                    </option>
                                                 <?php endforeach; ?>
                                             </select>
-                                            <input type="url" name="link_url[]" value="<?php echo htmlspecialchars($link['url']); ?>" placeholder="URL Link" class="w-full flex-1 bg-white px-5 py-3 rounded-xl border border-gray-100 outline-none text-sm">
-                                            <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+                                            <input type="url" name="link_url[]" value="<?php echo htmlspecialchars($link['url']); ?>" placeholder="https://..." class="w-full flex-1 bg-white px-5 py-3 rounded-xl border border-gray-100 outline-none text-sm focus:border-brandTeal/50 transition">
+
+                                            <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
                                             </button>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
-                                <button type="button" onclick="addLinkRow()" class="mt-6 text-xs font-bold text-brandTeal hover:underline">+ Add Link</button>
+
+                                <button type="button" onclick="addLinkRow()" class="mt-6 inline-flex items-center gap-2 text-xs font-bold text-brandTeal hover:opacity-70 transition group">
+                                    <span class="w-8 h-8 bg-brandTeal/10 rounded-full flex items-center justify-center group-hover:bg-brandTeal group-hover:text-white transition">+</span>
+                                    Add Distribution Link
+                                </button>
                             </div>
 
                             <button type="submit" class="w-full py-5 bg-brandTeal text-white rounded-[24px] font-bold text-lg shadow-2xl shadow-brandTeal/30 hover:scale-[1.01] transition-all">
@@ -192,7 +272,9 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
         function previewSingle(input, targetId) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = e => { document.getElementById(targetId).src = e.target.result; }
+                reader.onload = e => {
+                    document.getElementById(targetId).src = e.target.result;
+                }
                 reader.readAsDataURL(input.files[0]);
             }
         }
@@ -201,7 +283,10 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
         document.getElementById('screenshot-input').addEventListener('change', function() {
             Array.from(this.files).forEach(file => {
                 const fileId = 'new_' + Math.random().toString(36).substr(2, 9);
-                newScreenshotFiles.push({ id: fileId, file: file });
+                newScreenshotFiles.push({
+                    id: fileId,
+                    file: file
+                });
 
                 const reader = new FileReader();
                 reader.onload = e => {
@@ -229,27 +314,41 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
         }
 
         // Initialize Sortable
-        new Sortable(previewContainer, { animation: 150, ghostClass: 'sortable-ghost' });
+        new Sortable(previewContainer, {
+            animation: 150,
+            ghostClass: 'sortable-ghost'
+        });
 
-        // Platform Links
-        const platformIcons = { 'Direct': '🌐', 'Steam': '🎮', 'PlayStore': '🤖', 'AppStore': '🍎' };
-        function updateIcon(select, idx) {
-            document.getElementById(`platform-icon-${idx}`).innerText = platformIcons[select.value] || '🌐';
-        }
+        // Di bagian <script>
+        const platformIcons = {
+            'Direct': '🌐',
+            'Steam': '🎮',
+            'PlayStore': '🤖',
+            'AppStore': '🍎',
+            'ItchIo': '🕹️',
+            'Epic': '🔥'
+        };
 
-        let linkIdx = <?php echo count($existing_links); ?>;
         function addLinkRow() {
             const container = document.getElementById('link-container');
+            const newIdx = Date.now(); // Gunakan timestamp agar ID unik
+
+            // Buat opsi dropdown secara dinamis dari object platformIcons
+            let optionsHtml = '';
+            for (const [name, icon] of Object.entries(platformIcons)) {
+                optionsHtml += `<option value="${name}">${name}</option>`;
+            }
+
             container.insertAdjacentHTML('beforeend', `
-                <div class="flex flex-col md:flex-row items-center gap-4 p-5 bg-gray-50 rounded-[24px] border border-gray-100 animate-fade-in group">
-                    <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm text-2xl border border-gray-50" id="platform-icon-${linkIdx}">🌐</div>
-                    <select name="link_platform[]" onchange="updateIcon(this, ${linkIdx})" class="w-full md:w-40 bg-transparent font-bold text-sm outline-none">
-                        <option value="Direct">Direct Link</option><option value="Steam">Steam</option><option value="PlayStore">PlayStore</option><option value="AppStore">AppStore</option>
-                    </select>
-                    <input type="url" name="link_url[]" placeholder="URL Link" class="w-full flex-1 bg-white px-5 py-3 rounded-xl border border-gray-100 outline-none text-sm">
-                    <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-                </div>`);
-            linkIdx++;
+        <div class="flex flex-col md:flex-row items-center gap-4 p-5 bg-gray-50 rounded-[24px] border border-gray-100 animate-fade-in group">
+            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm text-2xl border border-gray-50" id="platform-icon-${newIdx}">🌐</div>
+            <select name="link_platform[]" onchange="updateIcon(this, '${newIdx}')" class="w-full md:w-40 bg-transparent font-bold text-sm outline-none">
+                ${optionsHtml}
+            </select>
+            <input type="url" name="link_url[]" placeholder="https://..." class="w-full flex-1 bg-white px-5 py-3 rounded-xl border border-gray-100 outline-none text-sm focus:border-brandTeal/50 transition">
+            <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+    `);
         }
 
         // SUBMIT HANDLER
@@ -262,33 +361,45 @@ $existing_links = json_decode($game['distribution_links'], true) ?: [];
 
             allItems.forEach(el => {
                 if (el.getAttribute('data-type') === 'existing') {
-                    finalOrder.push({ type: 'existing', value: el.getAttribute('data-filename') });
+                    finalOrder.push({
+                        type: 'existing',
+                        value: el.getAttribute('data-filename')
+                    });
                 } else {
                     const id = el.getAttribute('data-id');
                     const fileObj = newScreenshotFiles.find(i => i.id === id);
                     if (fileObj) {
                         dataTransfer.items.add(fileObj.file);
-                        finalOrder.push({ type: 'new', value: fileObj.file.name });
+                        finalOrder.push({
+                            type: 'new',
+                            value: fileObj.file.name
+                        });
                     }
                 }
             });
 
             // Masukkan file baru yang sudah terurut
             const files = dataTransfer.files;
-            for (let i = 0; i < files.length; i++) { formData.append('screenshots[]', files[i]); }
-            
+            for (let i = 0; i < files.length; i++) {
+                formData.append('screenshots[]', files[i]);
+            }
+
             // Kirim JSON urutan akhir ke PHP
             formData.append('screenshot_order', JSON.stringify(finalOrder));
 
             // Kirim data menggunakan Fetch
-            fetch(this.action, { method: 'POST', body: formData })
-            .then(res => res.text())
-            .then(data => {
-                // Redirect ke games.php setelah sukses
-                window.location.href = 'games.php?status=success';
-            })
-            .catch(err => alert("Error: " + err));
+            fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.text())
+                .then(data => {
+                    // Redirect ke games.php setelah sukses
+                    window.location.href = 'games.php?status=success';
+                })
+                .catch(err => alert("Error: " + err));
         };
     </script>
 </body>
+
 </html>

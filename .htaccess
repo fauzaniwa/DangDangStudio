@@ -1,0 +1,14 @@
+RewriteEngine On
+RewriteBase /DangDangStudio/
+
+# 1. Jika mengakses root (/) langsung arahkan ke public/homepage
+RewriteRule ^$ public/homepage [L,R=301]
+
+# 2. Jika mengakses index.html secara manual, arahkan ke public/homepage
+RewriteRule ^index\.html$ public/homepage [L,R=301]
+
+# 3. Pastikan akses ke file aset (css/js/img) di folder public tetap bekerja
+# Rule ini menjaga agar resource tidak ikut ter-redirect secara salah
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/$1 [L]

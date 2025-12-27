@@ -46,6 +46,9 @@ $rec_result = mysqli_query($conn, "SELECT * FROM articles
             color: #1e293b;
             background-color: #FCFDFF;
         }
+        .article-content {
+            white-space: pre-line;
+        }
 
         .article-content p {
             margin-bottom: 1.8rem;
@@ -198,7 +201,7 @@ $rec_result = mysqli_query($conn, "SELECT * FROM articles
 
         <main class="lg:col-span-8 lg:col-start-3">
             <div class="article-content prose-slate max-w-none mb-32">
-                <?= $art['content'] ?>
+                <?= htmlspecialchars(string: $art['content']) ?>
             </div>
 
             <?php if (mysqli_num_rows($gallery_result) > 0): ?>

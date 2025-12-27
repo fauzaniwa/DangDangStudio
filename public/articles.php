@@ -2,6 +2,31 @@
 require_once '../admin/process/config.php';
 $category = isset($_GET['category']) ? $_GET['category'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
+
+// --- LOGIKA META DINAMIS ---
+$base_title = "Insights & Stories | DangDang Studio";
+$base_desc = "Eksplorasi proses kreatif, perancangan game, dan pemikiran terbaru dari DangDang Studio.";
+
+if (!empty($search)) {
+    $title = "Search: " . htmlspecialchars($search) . " | DangDang Studio";
+    $desc = "Menampilkan hasil pencarian untuk '" . htmlspecialchars($search) . "' di DangDang Studio Journal.";
+} elseif (!empty($category)) {
+    $title = htmlspecialchars($category) . " Archives | DangDang Studio";
+    $desc = "Kumpulan artikel dan insight terbaru dalam kategori " . htmlspecialchars($category) . ".";
+} else {
+    $title = $base_title;
+    $desc = $base_desc;
+}
+
+// URL absolut untuk meta tags
+$current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+// Mengambil OG Image dinamis (Cover artikel terbaru yang dipublish)
+$og_image = "https://www.studiodangdang.com/assets/img/default-og.jpg"; // Fallback default
+$query_cover = mysqli_query($conn, "SELECT cover_image FROM articles WHERE status = 'published' ORDER BY created_at DESC LIMIT 1");
+if ($row_cover = mysqli_fetch_assoc($query_cover)) {
+    $og_image = "https://studiodangdang.com/uploads/articles/" . $row_cover['cover_image'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -10,9 +35,30 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insights & Stories | DangDang Studio</title>
+
+    <title><?= $title ?></title>
+    <meta name="title" content="<?= $title ?>">
+    <meta name="description" content="<?= $desc ?>">
+    <meta name="author" content="DangDang Studio">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?= $current_url ?>">
+    <meta property="og:title" content="<?= $title ?>">
+    <meta property="og:description" content="<?= $desc ?>">
+    <meta property="og:image" content="<?= $og_image ?>">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<?= $current_url ?>">
+    <meta property="twitter:title" content="<?= $title ?>">
+    <meta property="twitter:description" content="<?= $desc ?>">
+    <meta property="twitter:image" content="<?= $og_image ?>">
+
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap');
 
@@ -43,7 +89,6 @@ $search = isset($_GET['search']) ? $_GET['search'] : '';
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);

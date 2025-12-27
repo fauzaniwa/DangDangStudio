@@ -85,10 +85,34 @@
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1">Category</label>
                                         <select name="category" required class="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-brandGold outline-none transition font-bold text-sm">
-                                            <option value="Announcement">Announcement</option>
-                                            <option value="Development Log">Development Log</option>
-                                            <option value="Art Showcase">Art Showcase</option>
-                                            <option value="Event">Event</option>
+
+                                            <optgroup label="General">
+                                                <option value="Announcement">Announcement</option>
+                                                <option value="News">News</option>
+                                                <option value="Event">Event</option>
+                                                <option value="Community">Community</option>
+                                            </optgroup>
+
+                                            <optgroup label="Game Development">
+                                                <option value="Development Log">Development Log</option>
+                                                <option value="Patch Notes">Patch Notes</option>
+                                                <option value="Technical">Technical Breakdown</option>
+                                                <option value="Roadmap">Roadmap</option>
+                                            </optgroup>
+
+                                            <optgroup label="Creative & Lore">
+                                                <option value="Art Showcase">Art Showcase</option>
+                                                <option value="Concept Art">Concept Art</option>
+                                                <option value="Lore">Lore & World Building</option>
+                                                <option value="Audio">Soundtrack & Audio</option>
+                                                <option value="Behind the Scenes">Behind the Scenes</option>
+                                            </optgroup>
+
+                                            <optgroup label="Resources">
+                                                <option value="Tutorial">Tutorial</option>
+                                                <option value="Interview">Interview</option>
+                                            </optgroup>
+
                                         </select>
                                     </div>
                                     <div>

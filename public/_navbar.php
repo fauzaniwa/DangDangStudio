@@ -11,10 +11,11 @@
         </a>
 
         <div class="hidden lg:flex gap-10 text-[10px] font-black uppercase tracking-[0.25em]" style="color: #333A73;">
-            <a href="#about" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">About</a>
-            <a href="#games" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">Games</a>
-            <a href="#articles" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">Insight</a>
-            <a href="#contact" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">Contact</a>
+            <a href="homepage.php#about" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">About</a>
+            <a href="homepage.php#games" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">Games</a>
+            <a href="homepage.php#articles" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">Insight</a>
+            <a href="homepage.php#contact" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">Contact</a>
+            <a href="team.php" class="hover:text-brandTeal transition-all hover:tracking-[0.35em]">Team</a>
         </div>
 
         <div class="lg:hidden">
@@ -42,10 +43,11 @@
                     -webkit-backdrop-filter: blur(25px); 
                     border: 1px solid rgba(255, 255, 255, 0.5);
                     display: none;">
-            <a @click="mobileMenuOpen = false" href="#about" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">About</a>
-            <a @click="mobileMenuOpen = false" href="#games" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">Games</a>
-            <a @click="mobileMenuOpen = false" href="#articles" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">Insight</a>
-            <a @click="mobileMenuOpen = false" href="#contact" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">Contact</a>
+            <a @click="mobileMenuOpen = false" href="homepage.php#about" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">About</a>
+            <a @click="mobileMenuOpen = false" href="homepage.php#games" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">Games</a>
+            <a @click="mobileMenuOpen = false" href="homepage.php#articles" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">Insight</a>
+            <a @click="mobileMenuOpen = false" href="homepage.php#contact" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">Contact</a>
+            <a @click="mobileMenuOpen = false" href="team.php" class="text-xs font-black uppercase tracking-[0.3em] hover:text-brandTeal transition-all" style="color: #333A73;">Team</a>
         </div>
     </div>
 </nav>

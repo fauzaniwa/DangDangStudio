@@ -42,3 +42,37 @@ body {
     background-image: radial-gradient(at 0% 0%, rgba(1, 158, 154, 0.1) 0px, transparent 50%),
                       radial-gradient(at 100% 100%, rgba(255, 97, 54, 0.08) 0px, transparent 50%);
 }
+
+ /* Animasi Marquee */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .animate-marquee {
+            display: flex;
+            width: fit-content;
+            animation: marquee 30s linear infinite;
+        }
+
+        /* Versi lebih cepat untuk mobile agar tidak membosankan */
+        .animate-marquee-fast {
+            display: flex;
+            width: fit-content;
+            animation: marquee 20s linear infinite;
+        }
+
+        /* Berhenti saat hover (hanya di perangkat yang mendukung hover/Desktop) */
+        @media (hover: hover) {
+            .group:hover .animate-marquee,
+            .group:hover .animate-marquee-fast {
+                animation-play-state: paused;
+            }
+        }
+
+        /* Responsivitas untuk memastikan logo tidak terlalu besar di layar kecil */
+        @media (max-width: 768px) {
+            .animate-marquee-fast {
+                gap: 3rem; /* Mempersempit jarak antar logo di mobile */
+            }
+        }

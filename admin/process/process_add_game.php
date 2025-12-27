@@ -21,20 +21,22 @@ function createSlug($string) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin_id = $_SESSION['admin_id'];
 
-    // 1. Tangkap Data Teks
-    $title = mysqli_real_escape_string($conn, $_POST['title']);
-    $trailer_url = mysqli_real_escape_string($conn, $_POST['trailer_url']);
-    $category = mysqli_real_escape_string($conn, $_POST['category']);
-    $short_desc = mysqli_real_escape_string($conn, $_POST['short_desc']);
-    $long_desc = mysqli_real_escape_string($conn, $_POST['long_desc']);
+    // 1. Tangkap Data Teks Murni
+    // JANGAN gunakan mysqli_real_escape_string di sini karena kita menggunakan Prepared Statements.
+    // Ini memastikan karakter baris baru (\n) tersimpan apa adanya tanpa rusak.
+    $title       = $_POST['title'];
+    $trailer_url = $_POST['trailer_url'];
+    $category    = $_POST['category'];
+    $short_desc  = $_POST['short_desc'];
+    $long_desc   = $_POST['long_desc'];
 
     // --- IMPLEMENTASI SLUG ---
     $slug = createSlug($title);
     
-    // Cek apakah slug sudah ada (untuk mencegah duplikasi URL)
-    $check_slug = mysqli_query($conn, "SELECT id FROM games WHERE slug = '$slug'");
+    // Khusus untuk query manual (non-prepared), kita gunakan escape string
+    $safe_slug = mysqli_real_escape_string($conn, $slug);
+    $check_slug = mysqli_query($conn, "SELECT id FROM games WHERE slug = '$safe_slug'");
     if (mysqli_num_rows($check_slug) > 0) {
-        // Jika ada yang sama, tambahkan suffix waktu unik
         $slug = $slug . '-' . time();
     }
     // -------------------------
@@ -92,26 +94,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $screenshots_json = json_encode($screenshot_names);
 
-    // 4. Insert ke Database (Ditambahkan kolom 'slug')
+    // 4. Insert ke Database dengan Prepared Statement
+    // SQL ini menggunakan 10 placeholder (?)
     $sql = "INSERT INTO games (title, slug, trailer_url, category, short_desc, long_desc, header_image, game_logo, screenshots, distribution_links, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
     
-    $stmt = $conn->prepare($sql);
-    // Bind parameter ditambahkan satu "s" untuk slug
-    $stmt->bind_param("ssssssssss", $title, $slug, $trailer_url, $category, $short_desc, $long_desc, $header_image, $game_logo, $screenshots_json, $links_json);
+    if ($stmt = $conn->prepare($sql)) {
+        // Bind parameter (10 string = "ssssssssss")
+        $stmt->bind_param("ssssssssss", 
+            $title, 
+            $slug, 
+            $trailer_url, 
+            $category, 
+            $short_desc, 
+            $long_desc, 
+            $header_image, 
+            $game_logo, 
+            $screenshots_json, 
+            $links_json
+        );
 
-    if ($stmt->execute()) {
-        // 5. Catat ke admin_logs
-        $log_activity = "Berhasil menambahkan game baru: $title";
-        $log_type = "success";
-        
-        $log_stmt = $conn->prepare("INSERT INTO admin_logs (admin_id, activity, type, ip_address, created_at) VALUES (?, ?, ?, ?, NOW())");
-        $log_stmt->bind_param("isss", $admin_id, $log_activity, $log_type, $ip_address);
-        $log_stmt->execute();
+        if ($stmt->execute()) {
+            // 5. Catat ke admin_logs
+            $log_activity = "Berhasil menambahkan game baru: $title";
+            $log_type = "success";
+            
+            $log_stmt = $conn->prepare("INSERT INTO admin_logs (admin_id, activity, type, ip_address, created_at) VALUES (?, ?, ?, ?, NOW())");
+            $log_stmt->bind_param("isss", $admin_id, $log_activity, $log_type, $ip_address);
+            $log_stmt->execute();
 
-        header("Location: ../games.php?status=success");
+            header("Location: ../games.php?status=success");
+            exit();
+        } else {
+            header("Location: ../game_add.php?status=error");
+            exit();
+        }
     } else {
-        header("Location: ../game_add.php?status=error");
+        // Logika jika prepare gagal
+        header("Location: ../game_add.php?status=error_db");
+        exit();
     }
 }
-exit();
